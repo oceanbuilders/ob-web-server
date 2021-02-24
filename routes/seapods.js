@@ -147,7 +147,7 @@ router.get('/:seapodId/users/:userId', auth, async (req, res) => {
     return res.send(result.seapodUsers);
 });
 
-router.get('/qrcode/:vessleCode', async (req, res)=> {
+router.get('/qrcode/:vessleCode', auth, async (req, res)=> {
     const seaPodService = new SeaPodService();
     const result = await seaPodService.getQrImage(req.params.vessleCode);
 
