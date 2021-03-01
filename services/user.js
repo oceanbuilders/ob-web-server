@@ -334,7 +334,7 @@ class UserService {
 
             seapods.forEach(async seapod => {
                 let owner = seapod.users.find(user => user.type == 'OWNER')
-                owner = _.pick(owner, ['_id', 'userName', 'checkInDate', 'profilePicUrl']);
+                owner = _.pick(owner, ['_id', 'userName', 'profilePicUrl']);
 
                 owners.push(owner)
             });
@@ -348,7 +348,8 @@ class UserService {
                     let seapodUser = seapod.users.find(user => user._id == owners[i]._id)
                     const seapodInstance = {
                         seapodName,
-                        userType: seapodUser.type
+                        userType: seapodUser.type,
+                        checkInDate: seapodUser.checkInDate
                     }
                     owners[i].seaPods.push(seapodInstance)
                 })
