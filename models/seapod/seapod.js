@@ -235,7 +235,7 @@ seaPodSchema.methods.generateQrCode = async function (vessleCode, hostName) {
     await qrcode.toFile(`${dir}/${vessleCode}.png`, vessleCode);
     uploadFile(`${dir}/${vessleCode}.png`);
 
-    return `https://${hostName}/v1/api/seapods/qrcodes/${vessleCode}.png`;
+    return `https://${hostName}/v1/api/seapods/qrcode/${vessleCode}.png`;
 }
 
 seaPodSchema.methods.generateRandomLocation = function () {
