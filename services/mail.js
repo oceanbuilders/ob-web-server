@@ -10,7 +10,7 @@ class MailService {
         let cheers = subject=='URGENT NOTIFICATION'? null:
         `<td align="center" class="footercopy">
             Cheers!
-        </td>`;
+        </td>`
 
         const msg = {
             to: to,
@@ -295,7 +295,7 @@ class MailService {
                 </table>
                 <table align="center" border="0" cellspacing="0" cellpadding="0">
                     <td>
-                        <img src='https://oceanbuilders-main-app.s3.us-east-2.amazonaws.com/QRplacement.png' width="130" height="130" alt="QR code" border="0">
+                        <img src="https://oceanbuilders-main-app.s3.us-east-2.amazonaws.com/QRplacement.png" width="130" height="130" alt="QR code" border="0">
                     </td>
                 </table>
             </td>
