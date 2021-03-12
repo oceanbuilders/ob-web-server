@@ -5,13 +5,9 @@ class Notifier {
         const message = {
             notification: {
                 title: notificationContainer.title,
-                body: notificationContainer.data
+                body: notificationContainer.body
             },
-            data: {
-                click_action: 'FLUTTER_NOTIFICATION_CLICK',
-                notificationData: JSON.stringify(notificationContainer.data),
-                type: notificationContainer.type
-            },
+            data: JSON.stringify(notificationContainer.data),
             tokens: tokens
         }
         sendMultipleNotification(message);
