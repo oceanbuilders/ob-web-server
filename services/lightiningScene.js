@@ -28,15 +28,15 @@ class LightiningSceneService {
                 return {
                     isError: true,
                     statusCode: 401,
-                    error: 'Access denied. Not A member at the seapod!'
+                    error: 'Not Authorized!'
                 }
 
             const user = await User.findById(userId);
             if (!user) {
                 return {
                     isError: true,
-                    statusCode: 404,
-                    error: 'User Not Found!'
+                    statusCode: 401,
+                    error: 'Not Authorized!'
                 };
             }
 
@@ -123,21 +123,21 @@ class LightiningSceneService {
             if (!this.isSeaPodUser(seapod, userId)) return {
                 isError: true,
                 statusCode: 401,
-                error: 'Access denied. Not A member at the seapod!'
+                error: 'Not Authorized'
             }
 
             const user = await User.findById(userId);
             if (!user) return {
                 isError: true,
-                statusCode: 404,
-                error: 'User Not Found!'
+                statusCode: 401,
+                error: 'Not Authorized'
             };
 
             const selectedLightScene = await LightiningScene.findById(lightScene._id);
             if (userId != selectedLightScene.userId) return {
                 isError: true,
                 statusCode: 401,
-                error: 'Access denied. Not your own LightScene!!'
+                error: 'Not Authorized'
             };
 
             let allLightScenes;
@@ -262,14 +262,14 @@ class LightiningSceneService {
             if (!this.isSeaPodUser(seapod, userId)) return {
                 isError: true,
                 statusCode: 401,
-                error: 'Access denied. Not A member at the seapod!'
+                error: 'Not Authorized'
             }
 
             const user = await User.findById(userId);
             if (!user) return {
                 isError: true,
-                statusCode: 404,
-                error: 'User Not Found!'
+                statusCode: 401,
+                error: 'Not Authorized'
             };
 
             if (source == 'seapod') {
@@ -346,7 +346,7 @@ class LightiningSceneService {
         if (!currentUser) return {
             isError: true,
             statusCode: 401,
-            error: 'Access denied. Not A member at the seapod!'
+            error: 'Not Authorized'
         }
 
         currentUser.lighting.intensity = intensity;
@@ -363,8 +363,8 @@ class LightiningSceneService {
         const user = await User.findById(userId);
         if (!user) return {
             isError: true,
-            statusCode: 404,
-            error: 'User Not Found!'
+            statusCode: 401,
+            error: 'Not Authorized'
         };
 
         const seapod = await SeaPod.findById(seapodId)
@@ -382,7 +382,7 @@ class LightiningSceneService {
         if (!currentUser) return {
             isError: true,
             statusCode: 401,
-            error: 'Access denied. Not A member at the seapod!'
+            error: 'Not Authorized'
         }
 
         currentUser.lighting.status = !currentUser.lighting.status;
@@ -426,7 +426,7 @@ class LightiningSceneService {
         if (!currentUser) return {
             isError: true,
             statusCode: 401,
-            error: 'Access denied. Not A member at the seapod!'
+            error: 'Not Authorized'
         }
 
         let allLightScenes;
@@ -439,7 +439,7 @@ class LightiningSceneService {
         if (!found) return {
             isError: true,
             statusCode: 401,
-            error: 'Access denied. LightScene is not avaliable for this user'
+            error: 'Not Authorized'
         }
 
         seapod.selectedScene = found._id;
@@ -476,8 +476,8 @@ class LightiningSceneService {
         const user = await User.findById(userId);
         if (!user) return {
             isError: true,
-            statusCode: 404,
-            error: 'User Not Found!'
+            statusCode: 401,
+            error: 'Not Authorized'
         };
 
         const lightScene = await LightiningScene.findById(lightSceneId).populate('rooms.config')
@@ -526,8 +526,8 @@ class LightiningSceneService {
         const user = await User.findById(userId);
         if (!user) return {
             isError: true,
-            statusCode: 404,
-            error: 'User Not Found!'
+            statusCode: 401,
+            error: 'Not Authorized'
         };
 
         const lightScene = await LightiningScene.findById(lightSceneId).populate('rooms.config')
@@ -575,8 +575,8 @@ class LightiningSceneService {
         const user = await User.findById(userId);
         if (!user) return {
             isError: true,
-            statusCode: 404,
-            error: 'User Not Found!'
+            statusCode: 401,
+            error: 'Not Authorized'
         };
 
         const lightScene = await LightiningScene.findById(lightSceneId)
