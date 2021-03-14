@@ -3,6 +3,11 @@ const app = express();
 const winston = require('winston');
 const cors=require('cors');
 
+if(typeof(process.env["FIREBASE_PRIVATE_KEY"]) === 'undefined') {
+	console.log("[ERROR] Missing environment variable FIREBASE_PRIVATE_KEY\n");
+	process.exit(1);
+}
+
 app.use(cors());
 require('dotenv').config();
 
