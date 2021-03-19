@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: 'A prototype API to control light on seapod'
-  version: 1.0.0.0
+  version: 0.8.0
   title: 'light control api'
   termsOfService: "https://oceanbuilders.com/terms/"
   contact:
@@ -66,7 +66,7 @@ paths:
   # this operation returns the list of available lights
   /light:
     get:
-      description: Returns a list of lights.
+      summary: Return a list of lights.
       responses:
         '200':
           description: Successfully returned a list of lights.
@@ -96,7 +96,7 @@ paths:
                 $ref: '#/components/schemas/Error'
   # this operation adds a new light
     post:
-      description : Lets a user post a new light.
+      summary : Add new light.
       requestBody:
         description: Light opbject that needs to be added
         content:
@@ -128,7 +128,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      summary: Update an existing light
+      summary: Update an existing light.
       requestBody:
         description: Light object that needs to be updated
         content:
@@ -152,7 +152,7 @@ paths:
   # this operation returns a light details
   /lights/{id}:
     get:
-      description: Obtain information about a light
+      summary: Return information of light by its id
       parameters:
       - name: "id"
         in: "path"
@@ -185,5 +185,4 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'        
-                
+                $ref: '#/components/schemas/Error'
