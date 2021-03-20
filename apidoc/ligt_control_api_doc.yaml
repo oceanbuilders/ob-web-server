@@ -1,0 +1,188 @@
+openapi: 3.0.0
+info:
+  description: 'A prototype API to control light on seapod'
+  version: 0.8.0
+  title: 'light control api'
+  termsOfService: "https://oceanbuilders.com/terms/"
+  contact:
+    email: "apiteam@oceanbuilders.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+servers:
+- url: https://oceanbuilders.herokuapp.com/v1
+
+# Basic authentication   
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+    Light:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID of the light.
+          example: 1
+        desc:
+          type: string
+          description: bedroom light.
+        group:
+          type: string
+          description: Group of the light.
+          example: LightGroup1
+        type:
+          type: string
+          description: Type of the light.
+          example: A
+        status:
+          type: boolean
+          description: On/Off status of the light.
+          example: false
+        color:
+          type: string
+          description: Color of the light.
+          example: oxFFFFFFF
+      required:
+        - id   
+  parameters:
+    Id:
+      name: id
+      in: query
+      description: Uniquely identify a light.
+      schema:
+        type: integer
+      
+paths:
+  # this operation returns the list of available lights
+  /light:
+    get:
+      summary: Return a list of lights.
+      responses:
+        '200':
+          description: Successfully returned a list of lights.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Light'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/Error'   
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/Error'                           
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  # this operation adds a new light
+    post:
+      summary : Add new light.
+      requestBody:
+        description: Light opbject that needs to be added
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Light'
+        required: true      
+      responses:
+        200:
+          description: Successfully created a new light.
+        405:
+          description: Invalid input  
+        400:
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/Error'   
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update an existing light.
+      requestBody:
+        description: Light object that needs to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Light'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Light'
+        required: true
+      responses:
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Light not found
+          content: {}
+        405:
+          description: Validation exception
+          content: {}                
+  # this operation returns a light details
+  /lights/{id}:
+    get:
+      summary: Return information of light by its id
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of light to return"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        '200':
+          description: Successfully returned a light
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Light'
+        '400':
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                 $ref: '#/components/schemas/Error'   
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
