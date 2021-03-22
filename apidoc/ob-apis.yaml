@@ -12,7 +12,7 @@ info:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 servers:
-- url: https://oceanbuilders.herokuapp.com/v1
+- url: https://oceanbuilders.herokuapp.com/v1/api
 
 tags:
   - name: Auth
@@ -52,7 +52,7 @@ components:
         mobileNumber: '+201564324522'
         password: String@14*
         country: Spain
-    seapod:
+    seaPod:
       type: object
       properties:
         SeaPodName:
@@ -142,13 +142,19 @@ components:
         interiorBedroomWallColor: '0xff123456'
         deckFloorFinishMaterial: deckFloorFinishMaterial
         seaPodStatus: seaPodStatus
-    userAndSeapod:
+    loginUser:
       type: object
       properties:
-        user:
-          $ref: '#/components/schemas/user'
-        seapod:
-          $ref: '#/components/schemas/seapod'
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          pattern: ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
+      example:
+        email: user@example.com
+        password: String@14*
+    
         
   # Reusable path, query, header and cookie parameters
   parameters:
@@ -171,26 +177,33 @@ components:
       schema:
         type: string
       required: true
+    x-auth-token:
+      name: x-auth-token
+      in: header
+      schema:
+        type: string
+      required: true
   
-  # # Security scheme definitions (see Authentication)
-  # securitySchemes:
-  
-  # # Reusable request bodies
-  # requestBodies:
-  
-  # # Reusable responses, such as 401 Unauthorized or 400 Bad Request
-  # responses:
-  
-  # # Reusable response headers
-  # headers:
- 
-  
+  # Reusable responses, such as 401 Unauthorized or 400 Bad Request
+  responses:
+    404UserNotFound:
+      description: ''
+      content:
+        application/json:
+          schema:
+            type: object
+            properties: 
+              message:
+                type: string
+            example: 
+              message: User Not Found
+    
 paths:
   /auth:
     post:
       tags:
         - Auth
-      summary: Create new user associated with new seapod
+      summary: Create new user associated with new seapod, it sends confirmation email
       description: ''
       operationId: SignUpWithSeaPodCreation
       requestBody:
@@ -199,121 +212,145 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/userAndSeapod'
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/user'
+                  seaPod:
+                    $ref: '#/components/schemas/seaPod'
       parameters:
         - $ref: '#/components/parameters/notificationToken'
         - $ref: '#/components/parameters/hardwareId'
         - $ref: '#/components/parameters/model'
-        
       responses:
         '200':
-          description: OK
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  message:
+                    type: string
+                example: 
+                  message: 'An email has been sent to your email with further instructions' 
+        '404':
+          $ref: '#/components/responses/404UserNotFound'
+        # '400':
+        #   description: 'user and sea pod data are required, Validation Error'
+        # '500':
+        #   description: 'Internal Server Error, Header Parameters is missing'
+    
+    put:
+      tags:
+        - Auth
+      summary: Login with email and password
+      description: ''
+      operationId: login
+      requestBody:
+        required: true
+        description: A JSON object containing user information and seapod information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginUser'
+      parameters:
+        - $ref: '#/components/parameters/notificationToken'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/model'
+      responses:
+        '200':
+          description: 'OK'
         '400':
-          description: 'user and sea pod data are required, Validation Error'
+          description: 'Your email and password combination was incorrect. Please try again.'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
-          
-  #   put:
-  #     tags:
-  #       - Auth
-  #     summary: Login with email and password
-  #     description: ''
-  #     operationId: login
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: User Information and Seapod Information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             email:
-  #               type: string
-  #               format: email
-  #             password:
-  #               type: string
-  #               pattern: >-
-  #                 ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
-  #           example:
-  #             email: user@example.com
-  #             password: String@14*
-  #       - in: header
-  #         name: notificationToken
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: model
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Your email and password combination was incorrect. Please try again.
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /auth/me:
-  #   get:
-  #     tags:
-  #       - Auth
-  #     summary: Login with token
-  #     description: ''
-  #     operationId: autoLogin
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
-  #     parameters:
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Your email and password combination was incorrect. Please try again.
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /users/logout:
-  #   post:
-  #     tags:
-  #       - Auth
-  #     summary: Logout
-  #     description: ''
-  #     operationId: Logout
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
-  #     parameters:
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: error logging out
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
+  
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Login with token
+      description: ''
+      operationId: autoLogin
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your email and password combination was incorrect. Please try again.'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /auth/confirmation/{token}:
+    get:
+      tags:
+        - Auth
+      summary: Confirm the user account 
+      description: ''
+      operationId: confirm
+      parameters:
+        - name: token
+          in: "path"
+          description: "confirmation token of user account"
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your email and password combination was incorrect. Please try again.'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'  
+  
+  /auth/resend:
+    post:
+      tags:
+        - Auth
+      summary: Resend confirmation email
+      description: ''
+      operationId: resendConfirm
+      requestBody:
+        required: true
+        description: A JSON object containing user id
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId: 
+                  type: string
+              example:
+                userId: '5fe77c98478d4c09ae8de3b3'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your email and password combination was incorrect. Please try again.'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'  
+  
+  /users/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout
+      description: ''
+      operationId: Logout
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'error logging out'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+
   # /seapods:
   #   post:
   #     tags:
@@ -321,10 +358,6 @@ paths:
   #     summary: Create New Seapod
   #     description: ''
   #     operationId: createSeapod
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -444,10 +477,6 @@ paths:
   #     summary: Change Seapod Name
   #     description: ''
   #     operationId: changeSeapodName
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -493,10 +522,6 @@ paths:
   #     summary: Remove Member from Seapod
   #     description: ''
   #     operationId: removeUserFromSeapod
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: seapodId
@@ -535,10 +560,6 @@ paths:
   #     summary: Get seaPodUser Details by Id
   #     description: ''
   #     operationId: getUserDetails
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: seapodId
@@ -574,10 +595,6 @@ paths:
   #     summary: Create New LightScene
   #     description: ''
   #     operationId: createLightScene
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -660,10 +677,6 @@ paths:
   #     summary: Update Lightscene Details
   #     description: ''
   #     operationId: updateLightScene
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -746,10 +759,6 @@ paths:
   #     summary: Delete Lightscene
   #     description: ''
   #     operationId: deleteLightScene
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: id
@@ -780,10 +789,6 @@ paths:
   #     summary: Update LightScene Intensity
   #     description: ''
   #     operationId: updateLightSceneIntensity
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: seapodId
@@ -821,10 +826,6 @@ paths:
   #     summary: Update Light Intensity
   #     description: ''
   #     operationId: updateLightIntensity
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -871,10 +872,6 @@ paths:
   #     summary: Update LightScene Status
   #     description: ''
   #     operationId: updateLightSceneStatus
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: seapodId
@@ -907,10 +904,6 @@ paths:
   #     summary: Update Light Status
   #     description: ''
   #     operationId: updateLightStatus
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -952,10 +945,6 @@ paths:
   #     summary: Update Selected LightScene
   #     description: ''
   #     operationId: updateSelectedLightScene
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: seapodId
@@ -993,10 +982,6 @@ paths:
   #     summary: Reset Password
   #     description: ''
   #     operationId: resetPassword
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1050,10 +1035,6 @@ paths:
   #     summary: Forget Password
   #     description: ''
   #     operationId: forgetPassword
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1081,10 +1062,6 @@ paths:
   #     summary: Update Profile
   #     description: ''
   #     operationId: updateProfile
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1133,10 +1110,6 @@ paths:
   #     summary: Get User Seapods
   #     description: ''
   #     operationId: getUserSeapods
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: header
   #         name: x-auth-token
@@ -1160,10 +1133,6 @@ paths:
   #     summary: Add new permission
   #     description: ''
   #     operationId: addNewPermission
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1285,10 +1254,6 @@ paths:
   #     summary: Update permission
   #     description: ''
   #     operationId: updatePermission
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1413,10 +1378,6 @@ paths:
   #     summary: Get Permission By Id
   #     description: ''
   #     operationId: getPermissionById
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: id
@@ -1447,10 +1408,6 @@ paths:
   #     summary: Rename permission
   #     description: ''
   #     operationId: renamePermission
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1501,10 +1458,6 @@ paths:
   #     summary: Delete permission
   #     description: ''
   #     operationId: deletePermission
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: permissionId
@@ -1544,10 +1497,6 @@ paths:
   #     summary: Add permission to user
   #     description: ''
   #     operationId: addPermissionToUser
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1593,10 +1542,6 @@ paths:
   #     summary: Revoke permission from user
   #     description: ''
   #     operationId: revokePermissionFromUser
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1640,10 +1585,6 @@ paths:
   #     summary: Get Seapod Permissions
   #     description: ''
   #     operationId: getSeapodPermissions
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: seapodId
@@ -1674,10 +1615,6 @@ paths:
   #     summary: Get User Notifications
   #     description: ''
   #     operationId: getUserNotifications
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: header
   #         name: x-auth-token
@@ -1700,10 +1637,6 @@ paths:
   #     summary: Update All Seen Status of Notifications
   #     description: ''
   #     operationId: updateAllStatusNotifications
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: header
   #         name: x-auth-token
@@ -1727,10 +1660,6 @@ paths:
   #     summary: Toggle Seen Status of Notification by Id
   #     description: ''
   #     operationId: toggleStatusNotification
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: notificationId
@@ -1761,10 +1690,6 @@ paths:
   #     summary: Update Notification Settings
   #     description: ''
   #     operationId: updateNotificationSettings
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: header
   #         name: x-auth-token
@@ -1788,10 +1713,6 @@ paths:
   #     summary: Add Emergency Contact
   #     description: ''
   #     operationId: addEmergencyContact
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1837,10 +1758,6 @@ paths:
   #     summary: Update Emergency Contact by Id
   #     description: ''
   #     operationId: updateEmergencyContact
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: emergencyContactId
@@ -1868,10 +1785,6 @@ paths:
   #     summary: Delete Emergency Contact by Id
   #     description: ''
   #     operationId: deleteEmergencyContact
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: emergencyContactId
@@ -1902,10 +1815,6 @@ paths:
   #     summary: Send Access Request for Existing Users
   #     description: ''
   #     operationId: sendAccessRequestForExistingUsers
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -1962,10 +1871,6 @@ paths:
   #     summary: Send Access Request for New Users
   #     description: ''
   #     operationId: sendAccessRequestForNewUsers
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -2048,10 +1953,6 @@ paths:
   #     summary: Accept Access Request
   #     description: ''
   #     operationId: acceptAccessRequest
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
@@ -2112,10 +2013,6 @@ paths:
   #     summary: Reject Access Request
   #     description: ''
   #     operationId: rejectAccessRequest
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: accessRequestId
@@ -2152,10 +2049,6 @@ paths:
   #     summary: Cancel Access Request
   #     description: ''
   #     operationId: cancelAccessRequest
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: accessRequestId
@@ -2191,10 +2084,6 @@ paths:
   #     summary: Get Access Request by Id
   #     description: ''
   #     operationId: getAccessRequestById
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: accessRequestId
@@ -2225,10 +2114,6 @@ paths:
   #     summary: Get All Access Requests & Invitations of User
   #     description: ''
   #     operationId: getAllAccessRequestsAndInvitations
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: header
   #         name: x-auth-token
@@ -2252,10 +2137,6 @@ paths:
   #     summary: Accept Access Invitation
   #     description: ''
   #     operationId: acceptAccessInvitation
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: accessInvitationId
@@ -2292,10 +2173,6 @@ paths:
   #     summary: Reject Access Invitation
   #     description: ''
   #     operationId: rejectAccessInvitation
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: accessInvitationId
@@ -2332,10 +2209,6 @@ paths:
   #     summary: Cancel Access Invitaion
   #     description: ''
   #     operationId: cancelAccessInvitation
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: path
   #         name: id
@@ -2371,10 +2244,6 @@ paths:
   #     summary: Send Access Invitation and Add Member
   #     description: ''
   #     operationId: addMember
-  #     consumes:
-  #       - application/json
-  #     produces:
-  #       - application/json
   #     parameters:
   #       - in: body
   #         name: body
