@@ -388,38 +388,44 @@ class SeaPodService {
     }
 
     async getQrImage(vessleCode) {
+        
+            const seapod = await SeaPod.findOne({ 'vessleCode': vessleCode });
+            if (!seapod) return {
+                isError: true,
+                statusCode: 404,
+                error: "Seapod Not found!"
+            };
 
-        const seapod = await SeaPod.find({ 'vessleCode': vessleCode });
-        if (!seapod) return {
-            isError: true,
-            statusCode: 404,
-            error: "Seapod Not found!"
-        };
+            const dir = 'assets/qrcodes';
+            const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+            const IAM_USER_KEY = process.env.AWS_ACCESS_KEY_ID;
+            const IAM_USER_SECRET = process.env.AWS_SECRET_ACCESS_KEY;
 
-        const dir = 'assets/qrcodes';
-        const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
-        const IAM_USER_KEY = process.env.AWS_ACCESS_KEY_ID;
-        const IAM_USER_SECRET = process.env.AWS_SECRET_ACCESS_KEY;
+            const s3 = new AWS.S3({
+                accessKeyId: IAM_USER_KEY,
+                secretAccessKey: IAM_USER_SECRET
+            });
 
-        const s3 = new AWS.S3({
-            accessKeyId: IAM_USER_KEY,
-            secretAccessKey: IAM_USER_SECRET
-        });
+            const qrImagePath = `${dir}/${vessleCode}.png`
+        
+        try {
+            const qrImage = await s3.getObject({
+                Bucket: BUCKET_NAME,
+                Key: qrImagePath
+            }).promise();
 
-        const qrImagePath = `${dir}/${vessleCode}.png`
-
-        const qrImage = await s3.getObject({
-            Bucket: BUCKET_NAME,
-            Key: qrImagePath
-        }).promise();
-
-        fs.writeFileSync(qrImagePath, qrImage.Body);
+            fs.writeFileSync(qrImagePath, qrImage.Body);   
+        } catch (error) {
+            return {
+                statusCode: 500,
+                error: error.message
+            };
+        }
 
         return {
             isError: false,
             qrImagePath
         }
-
     }
 
     async getSeapodOwner(seapodId) {
