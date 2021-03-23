@@ -5,12 +5,12 @@ info:
     Ocean Builders at [https://ocean.builders/](https://ocean.builders/)
   version: 0.8.0
   title: 'Ocean Builder APIs'
-  termsOfService: "https://oceanbuilders.com/terms/"
+  termsOfService: 'https://oceanbuilders.com/terms/'
   contact:
     email: ola@oceanbuilders.io
   license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    name: 'Apache 2.0'
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
 - url: https://oceanbuilders.herokuapp.com/v1/api
 
@@ -183,6 +183,30 @@ components:
       schema:
         type: string
       required: true
+    seapodId:
+      name: seapodId
+      in: path
+      description: Numeric ID of the seapod
+      required: true
+      schema:
+        type: string
+      example: '5f6f45ce5ced392ed4c95e7e'
+    userId:
+      name: userId
+      in: path
+      description: Numeric ID of the user
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    vesselCode:
+      name: vesselCode
+      in: path
+      description: Vessel Code of Seapod
+      required: true
+      schema:
+        type: string
+      example: 'S7798A7'
   
   # Reusable responses, such as 401 Unauthorized or 400 Bad Request
   responses:
@@ -236,10 +260,10 @@ paths:
                   message: 'An email has been sent to your email with further instructions' 
         '404':
           $ref: '#/components/responses/404UserNotFound'
-        # '400':
-        #   description: 'user and sea pod data are required, Validation Error'
-        # '500':
-        #   description: 'Internal Server Error, Header Parameters is missing'
+        '400':
+          description: 'user and sea pod data are required, Validation Error'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
     
     put:
       tags:
@@ -293,8 +317,8 @@ paths:
       operationId: confirm
       parameters:
         - name: token
-          in: "path"
-          description: "confirmation token of user account"
+          in: path
+          description: 'confirmation token of user account'
           required: true
           schema:
             type: string
@@ -350,244 +374,165 @@ paths:
           description: 'error logging out'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
-
-  # /seapods:
-  #   post:
-  #     tags:
-  #       - Seapods
-  #     summary: Create New Seapod
-  #     description: ''
-  #     operationId: createSeapod
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: Seapod information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             SeaPodName:
-  #               type: string
-  #             exteriorFinish:
-  #               type: string
-  #             exterioirColor:
-  #               type: string
-  #               pattern: '^0xFF[A-F0-9]{6}$'
-  #             sparFinish:
-  #               type: string
-  #             sparDesign:
-  #               type: string
-  #             deckEnclosure:
-  #               type: string
-  #             bedAndLivingRoomEnclousure:
-  #               type: string
-  #             power:
-  #               type: string
-  #             powerUtilities:
-  #               type: array
-  #               items:
-  #                 type: string
-  #             underWaterRoomFinishing:
-  #               type: string
-  #             underWaterWindows:
-  #               type: string
-  #             soundSystem:
-  #               type: array
-  #               items:
-  #                 type: string
-  #             masterBedroomFloorFinishing:
-  #               type: array
-  #               items:
-  #                 type: string
-  #             masterBedroomInteriorWallColor:
-  #               type: string
-  #               pattern: '^0xFF[A-F0-9]{6}$'
-  #             livingRoomloorFinishing:
-  #               type: string
-  #             livingRoomInteriorWallColor:
-  #               type: string
-  #               pattern: '^0xFF[A-F0-9]{6}$'
-  #             kitchenfloorFinishing:
-  #               type: string
-  #             kitchenInteriorWallColor:
-  #               type: string
-  #               pattern: '^0xFF[A-F0-9]{6}$'
-  #             hasWeatherStation:
-  #               type: boolean
-  #             entryStairs:
-  #               type: boolean
-  #             hasFathometer:
-  #               type: boolean
-  #             hasCleanWaterLevelIndicator:
-  #               type: boolean
-  #             interiorBedroomWallColor:
-  #               type: string
-  #               pattern: '^0xFF[A-F0-9]{6}$'
-  #             deckFloorFinishMaterial:
-  #               type: string
-  #             seaPodStatus:
-  #               type: string
-  #           example:
-  #             SeaPodName: Sea Breeze
-  #             exteriorFinish: exfinish
-  #             exterioirColor: '0xff123456'
-  #             sparFinish: sparFinish
-  #             sparDesign: sparDesign
-  #             deckEnclosure: deckEnclosure
-  #             bedAndLivingRoomEnclousure: bedAndLivingRoomEnclousure
-  #             power: power
-  #             powerUtilities: []
-  #             underWaterRoomFinishing: underWaterRoomFinishing
-  #             underWaterWindows: underWaterWindows
-  #             soundSystem: []
-  #             masterBedroomFloorFinishing: []
-  #             masterBedroomInteriorWallColor: '0xff123456'
-  #             livingRoomloorFinishing: livingRoomloorFinishing
-  #             livingRoomInteriorWallColor: '0xff123456'
-  #             kitchenfloorFinishing: kitchenfloorFinishing
-  #             kitchenInteriorWallColor: '0xff123456'
-  #             hasWeatherStation: false
-  #             entryStairs: true
-  #             hasFathometer: false
-  #             hasCleanWaterLevelIndicator: false
-  #             interiorBedroomWallColor: '0xff123456'
-  #             deckFloorFinishMaterial: deckFloorFinishMaterial
-  #             seaPodStatus: seaPodStatus
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Seapod data is required, Seapod Validation'
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/seapods/{seapodId}/name':
-  #   put:
-  #     tags:
-  #       - Seapods
-  #     summary: Change Seapod Name
-  #     description: ''
-  #     operationId: changeSeapodName
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: Seapod information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             seapodName:
-  #               type: string
-  #           example:
-  #             seapodName: Updated SeaPod Name
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           Invalid seapod id, Seapod name is required, Seapod name validation
-  #           faild
-  #       '403':
-  #         description: Access denied. you are not allowed to update the seapod name
-  #       '404':
-  #         description: Seapod not found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/seapods/{seapodId}/users/{userId}':
-  #   delete:
-  #     tags:
-  #       - Seapods
-  #     summary: Remove Member from Seapod
-  #     description: ''
-  #     operationId: removeUserFromSeapod
-  #     parameters:
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: path
-  #         name: userId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the user to be removed
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           Invalid seapod id, Invalid user id, This member can't be
-  #           removed,SeaPod Must have at least one member
-  #       '403':
-  #         description: Access denied. you are not allowed to remove members
-  #       '404':
-  #         description: 'Seapod not found, User not found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   get:
-  #     tags:
-  #       - Seapods
-  #     summary: Get seaPodUser Details by Id
-  #     description: ''
-  #     operationId: getUserDetails
-  #     parameters:
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: path
-  #         name: userId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the user
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid seapod id, Invalid user id'
-  #       '404':
-  #         description: 'Seapod not found, User not found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
+  
+  /seapods:
+    post:
+      tags:
+        - Seapods
+      summary: Create New Seapod
+      description: ''
+      operationId: createSeapod
+      requestBody:
+        required: true
+        description: A JSON object containing user id
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/seaPod'
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Seapod data is required, Seapod Validation'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /seapods/{seapodId}/name:
+    put:
+      tags:
+        - Seapods
+      summary: Change Seapod Name
+      description: ''
+      operationId: changeSeapodName
+      requestBody:
+        required: true
+        description: A JSON object containing new seapod name
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seapodName:
+                  type: string
+              example:
+                seapodName: Updated SeaPod Name
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            Invalid seapod id, Seapod name is required, Seapod name validation
+            faild
+        '403':
+          description: Access denied. you are not allowed to update the seapod name
+        '404':
+          description: Seapod not found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /seapods/{seapodId}/users/{userId}:
+    delete:
+      tags:
+        - Seapods
+      summary: Remove Member from Seapod
+      description: ''
+      operationId: removeUserFromSeapod
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            Invalid seapod id, Invalid user id, This member can't be
+            removed,SeaPod Must have at least one member
+        '403':
+          description: 'Access denied. you are not allowed to remove members'
+        '404':
+          description: 'Seapod not found, User not found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    get:
+      tags:
+        - Seapods
+      summary: Get seaPodUser Details by Id
+      description: ''
+      operationId: getUserDetails
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id, Invalid user id'
+        '404':
+          description: 'Seapod not found, User not found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    put:
+      tags:
+        - Seapods
+      summary: Toggle Access Disable for User
+      description: 'Owner shall be able to disable the access of guest and members. Owners also can disable the access of the tenant but under some special conditions and regulations'
+      operationId: toggleIsDisableStatus
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id, Invalid user id'
+        '403':
+          description: 'Your are not allowed to take this action on the current seapod'
+        '404':
+          description: 'Seapod not found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /seapods/qrcode/{vesselCode}:
+    get:
+      tags:
+        - Seapods
+      summary: Get QR Image for Seapod by vesselCode
+      description: ''
+      operationId: getQrImage
+      parameters:
+        - $ref: '#/components/parameters/vesselCode'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: QR image in PNG format
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: 'Invalid seapod id, Invalid user id'
+        '404':
+          description: 'Seapod not found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
   # '/lightining-scenes/{id}':
   #   post:
   #     tags:

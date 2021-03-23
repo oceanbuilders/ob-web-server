@@ -1,0 +1,232 @@
+openapi: 3.0.0
+info:
+  description: >-
+    This is a API documentation for OB Admin Panel.  
+  version: 0.8.0
+  title: 'Ocean Builder APIs - Admin Panel'
+  termsOfService: "https://oceanbuilders.com/terms/"
+  contact:
+    email: ola@oceanbuilders.io
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+servers:
+- url: https://oceanbuilders.herokuapp.com/v1/api
+
+tags:
+  - name: Auth
+  - name: Seapods
+  - name: Light Scenes
+  - name: Users
+  - name: Permission
+  - name: Notifications
+  - name: Access Requests
+  - name: Emergency Contacts
+  
+components:
+  # Reusable schemas (data models)
+  schemas:
+    user:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        mobileNumber:
+          type: string
+          pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
+        password:
+          type: string
+          pattern: ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
+        country:
+          type: string
+      example:
+        firstName: Name
+        lastName: Name
+        email: user@example.com
+        mobileNumber: '+201564324522'
+        password: String@14*
+        country: Spain
+    seaPod:
+      type: object
+      properties:
+        SeaPodName:
+          type: string
+        exteriorFinish:
+          type: string
+        exterioirColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        sparFinish:
+          type: string
+        sparDesign:
+          type: string
+        deckEnclosure:
+          type: string
+        bedAndLivingRoomEnclousure:
+          type: string
+        power:
+          type: string
+        powerUtilities:
+          type: array
+          items:
+            type: string
+        underWaterRoomFinishing:
+          type: string
+        underWaterWindows:
+          type: string
+        soundSystem:
+          type: array
+          items:
+            type: string
+        masterBedroomFloorFinishing:
+          type: array
+          items:
+            type: string
+        masterBedroomInteriorWallColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        livingRoomloorFinishing:
+          type: string
+        livingRoomInteriorWallColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        kitchenfloorFinishing:
+            type: string
+        kitchenInteriorWallColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        hasWeatherStation:
+          type: boolean
+        entryStairs:
+          type: boolean
+        hasFathometer:
+          type: boolean
+        hasCleanWaterLevelIndicator:
+          type: boolean
+        interiorBedroomWallColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        deckFloorFinishMaterial:
+          type: string
+        seaPodStatus:
+          type: string
+      example:
+        SeaPodName: Sea Breeze
+        exteriorFinish: exfinish
+        exterioirColor: '0xff123456'
+        sparFinish: sparFinish
+        sparDesign: sparDesign
+        deckEnclosure: deckEnclosure
+        bedAndLivingRoomEnclousure: bedAndLivingRoomEnclousure
+        power: power
+        powerUtilities: []
+        underWaterRoomFinishing: underWaterRoomFinishing
+        underWaterWindows: underWaterWindows
+        soundSystem: []
+        masterBedroomFloorFinishing: []
+        masterBedroomInteriorWallColor: '0xff123456'
+        livingRoomloorFinishing: livingRoomloorFinishing
+        livingRoomInteriorWallColor: '0xff123456'
+        kitchenfloorFinishing: kitchenfloorFinishing
+        kitchenInteriorWallColor: '0xff123456'
+        hasWeatherStation: false
+        entryStairs: true
+        hasFathometer: false
+        hasCleanWaterLevelIndicator: false
+        interiorBedroomWallColor: '0xff123456'
+        deckFloorFinishMaterial: deckFloorFinishMaterial
+        seaPodStatus: seaPodStatus
+    loginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          pattern: ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
+      example:
+        email: user@example.com
+        password: String@14*
+    
+        
+  # Reusable path, query, header and cookie parameters
+  parameters:
+    notificationToken:
+      name: notificationToken
+      in: header
+      description: The notification token associated with the device.
+      schema:
+        type: string
+      required: true
+    hardwareId:
+      name: hardwareId
+      in: header
+      schema:
+        type: string
+      required: true
+    model:
+      name: model
+      in: header
+      schema:
+        type: string
+      required: true
+    x-auth-token:
+      name: x-auth-token
+      in: header
+      schema:
+        type: string
+      required: true
+  
+  # Reusable responses, such as 401 Unauthorized or 400 Bad Request
+  responses:
+    404UserNotFound:
+      description: ''
+      content:
+        application/json:
+          schema:
+            type: object
+            properties: 
+              message:
+                type: string
+            example: 
+              message: User Not Found
+    
+paths:
+  /seapods:
+    get:
+      tags:
+        - Seapods
+      summary: Get All Seapods - Only for Admins
+      description: ''
+      operationId: getAllSeapods
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '500':
+          description: 'Internal Server Error'  
+  
+  /seapods/{seapodId}:
+    get:
+      tags:
+        - Seapods
+      summary: Get Seapod Info by Id
+      description: ''
+      operationId: getSeapodById
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/seapodId'
+      responses:
+        '200':
+          description: 'OK'
+        '500':
+          description: 'Internal Server Error' 
