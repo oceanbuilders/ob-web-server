@@ -154,7 +154,50 @@ components:
       example:
         email: user@example.com
         password: String@14*
-    
+    lightScene:
+      type: object
+      properties: 
+        source:
+          type: string
+        sceneName:
+          type: string
+        rooms:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              moodes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    lightName:
+                      type: string
+                    lightColor:
+                      type: string
+                      pattern: '^0xFF[A-F0-9]{6}$'
+                    status:
+                      type: boolean
+                    brightness:
+                      type: integer
+                      minimum: 0
+                      maximum: 100
+      example:
+        source: seapod
+        sceneName: Day Mode
+        rooms:
+          - label: BedRoom
+            moodes:
+              - lightName: Lightstrip 1
+                lightColor: '0xFF9B9591'
+                status: false
+                brightness: 30
+              - lightName: Lightstrip 2
+                lightColor: '0xFF123456'
+                status: true
+                brightness: 50
         
   # Reusable path, query, header and cookie parameters
   parameters:
@@ -207,6 +250,14 @@ components:
       schema:
         type: string
       example: 'S7798A7'
+    lightSceneId:
+      name: lightSceneId
+      in: path
+      description: Numeric ID of the light scene
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
   
   # Reusable responses, such as 401 Unauthorized or 400 Bad Request
   responses:
@@ -520,213 +571,130 @@ paths:
         - $ref: '#/components/parameters/hardwareId'
       responses:
         '200':
-          description: QR image in PNG format
-          content:
-            image/png:
-              schema:
-                type: string
-                format: binary
+          description: 'OK'
         '400':
           description: 'Invalid seapod id, Invalid user id'
+        '403':
+          description: 'Forbidden. Access denied!'
         '404':
           description: 'Seapod not found'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
   
-  # '/lightining-scenes/{id}':
-  #   post:
-  #     tags:
-  #       - Light Scenes
-  #     summary: Create New LightScene
-  #     description: ''
-  #     operationId: createLightScene
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: LightScene information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             source:
-  #               type: string
-  #             sceneName:
-  #               type: string
-  #             rooms:
-  #               type: array
-  #               items:
-  #                 type: object
-  #                 properties:
-  #                   label:
-  #                     type: string
-  #                   moodes:
-  #                     type: array
-  #                     items:
-  #                       type: object
-  #                       properties:
-  #                         lightName:
-  #                           type: string
-  #                         lightColor:
-  #                           type: string
-  #                           pattern: '^0xFF[A-F0-9]{6}$'
-  #                         status:
-  #                           type: boolean
-  #                         brightness:
-  #                           type: integer
-  #                           minimum: 0
-  #                           maximum: 100
-  #           example:
-  #             source: seapod
-  #             sceneName: Day Mode
-  #             rooms:
-  #               - label: BedRoom
-  #                 moodes:
-  #                   - lightName: Lightstrip 1
-  #                     lightColor: '0xFF9B9591'
-  #                     status: false
-  #                     brightness: 30
-  #                   - lightName: Lightstrip 2
-  #                     lightColor: '0xFF123456'
-  #                     status: true
-  #                     brightness: 50
-  #       - in: path
-  #         name: id
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '201':
-  #         description: Created
-  #       '400':
-  #         description: >-
-  #           LightScene data is required, Invalid seapod id, LightScene
-  #           validation faild, Duplicated Scene Name, LightScene source is not
-  #           defiend
-  #       '401':
-  #         description: Access denied. Not A member at the seapod
-  #       '404':
-  #         description: 'Seapod Not Found, User Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   put:
-  #     tags:
-  #       - Light Scenes
-  #     summary: Update Lightscene Details
-  #     description: ''
-  #     operationId: updateLightScene
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: LightScene information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             source:
-  #               type: string
-  #             sceneName:
-  #               type: string
-  #             rooms:
-  #               type: array
-  #               items:
-  #                 type: object
-  #                 properties:
-  #                   label:
-  #                     type: string
-  #                   moodes:
-  #                     type: array
-  #                     items:
-  #                       type: object
-  #                       properties:
-  #                         lightName:
-  #                           type: string
-  #                         lightColor:
-  #                           type: string
-  #                           pattern: '^0xFF[A-F0-9]{6}$'
-  #                         status:
-  #                           type: boolean
-  #                         brightness:
-  #                           type: integer
-  #                           minimum: 0
-  #                           maximum: 100
-  #           example:
-  #             source: seapod
-  #             sceneName: Day Mode
-  #             rooms:
-  #               - label: BedRoom
-  #                 moodes:
-  #                   - lightName: Lightstrip 1
-  #                     lightColor: '0xFF9B9591'
-  #                     status: false
-  #                     brightness: 30
-  #                   - lightName: Lightstrip 2
-  #                     lightColor: '0xFF123456'
-  #                     status: true
-  #                     brightness: 50
-  #       - in: path
-  #         name: id
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the lightScene
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           LightScene data is required, Invalid lightScene id, LightScene
-  #           validation faild, Duplicated Scene Name, LightScene source is not
-  #           defiend
-  #       '401':
-  #         description: Access denied. Not A member at the seapod
-  #       '404':
-  #         description: 'LightScene Not Found, User Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   delete:
-  #     tags:
-  #       - Light Scenes
-  #     summary: Delete Lightscene
-  #     description: ''
-  #     operationId: deleteLightScene
-  #     parameters:
-  #       - in: path
-  #         name: id
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the lightScene
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Invalid lightScene id
-  #       '404':
-  #         description: 'LightScene Not Found, User Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
+  /seapods/{seapodId}/weatherSource/{source}:
+    put:
+      tags:
+        - Seapods
+      summary: Select Weather Source of the seapod 'local' or 'external'
+      description: ''
+      operationId: selectWeatherSource
+      parameters:
+        - name: source
+          in: path
+          description: 'Weather Source: local or external'
+          required: true
+          schema:
+            type: string
+          example: 'local'
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id!, Weather Source is required!'
+        '403':
+          description: 'Forbidden. Access denied!'
+        '404':
+          description: 'Seapod not found!'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /lightining-scenes/{seapodId}:
+    post:
+      tags:
+        - Light Scenes
+      summary: Create New LightScene
+      description: ''
+      operationId: createLightScene
+      requestBody:
+        required: true
+        description: A JSON object containing light scene
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/lightScene'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: >-
+            LightScene data is required, Invalid seapod id, LightScene
+            validation faild, Duplicated Scene Name, LightScene source is not
+            defiend
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'Seapod Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  /lightining-scenes/{lightSceneId}:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Lightscene Details
+      description: ''
+      operationId: updateLightScene
+      requestBody:
+        required: true
+        description: A JSON object containing light scene
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/lightScene'
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            LightScene data is required, Invalid lightScene id, LightScene
+            validation faild, Duplicated Scene Name, LightScene source is not
+            defiend
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'LightScene Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    delete:
+      tags:
+        - Light Scenes
+      summary: Delete Lightscene
+      description: ''
+      operationId: deleteLightScene
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id'
+        '404':
+          description: 'LightScene Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
   # '/lightining-scenes/{seapodId}/intensity/{value}':
   #   put:
   #     tags:
