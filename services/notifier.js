@@ -7,7 +7,7 @@ class Notifier {
                 title: notificationContainer.title,
                 body: notificationContainer.body
             },
-            data: JSON.stringify(notificationContainer.data),
+            data: {payload: JSON.stringify(notificationContainer.data)},
             tokens: tokens
         }
         sendMultipleNotification(message);
