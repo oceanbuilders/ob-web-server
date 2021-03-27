@@ -19,10 +19,10 @@ tags:
   - name: Seapods
   - name: Light Scenes
   - name: Users
-  - name: Permission
   - name: Notifications
-  - name: Access Requests
   - name: Emergency Contacts
+  - name: Permission
+  - name: Access Requests
   
 components:
   # Reusable schemas (data models)
@@ -198,6 +198,18 @@ components:
                 lightColor: '0xFF123456'
                 status: true
                 brightness: 50
+    light:
+      type: object
+      properties:
+        lightId:
+          type: integer
+        intensity:
+          type: integer
+          minimum: 0
+          maximum: 100
+      example:
+        lightId: '5f19a3f3a225d02fb8499557'
+        intensity: 80
         
   # Reusable path, query, header and cookie parameters
   parameters:
@@ -643,6 +655,7 @@ paths:
           description: 'Seapod Not Found, User Not Found'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
+  
   /lightining-scenes/{lightSceneId}:
     put:
       tags:
@@ -695,350 +708,300 @@ paths:
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
           
-  # '/lightining-scenes/{seapodId}/intensity/{value}':
-  #   put:
-  #     tags:
-  #       - Light Scenes
-  #     summary: Update LightScene Intensity
-  #     description: ''
-  #     operationId: updateLightSceneIntensity
-  #     parameters:
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the lightScene
-  #       - in: path
-  #         name: value
-  #         type: integer
-  #         required: true
-  #         description: value of intensity
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Invalid seapod id
-  #       '401':
-  #         description: Access denied. Not A member at the seapod
-  #       '404':
-  #         description: 'Seapod Not Found, User Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/lightining-scenes/{lightSceneId}/lightIntensity':
-  #   put:
-  #     tags:
-  #       - Light Scenes
-  #     summary: Update Light Intensity
-  #     description: ''
-  #     operationId: updateLightIntensity
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: Light information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             lightId:
-  #               type: integer
-  #             intensity:
-  #               type: integer
-  #               minimum: 0
-  #               maximum: 100
-  #           example:
-  #             lightId: 5f19a3f3a225d02fb8499557
-  #             intensity: 80
-  #       - in: path
-  #         name: lightSceneId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the lightScene
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Invalid lightScene id
-  #       '404':
-  #         description: 'LightScene Not Found, User Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/lightining-scenes/{seapodId}/status':
-  #   put:
-  #     tags:
-  #       - Light Scenes
-  #     summary: Update LightScene Status
-  #     description: ''
-  #     operationId: updateLightSceneStatus
-  #     parameters:
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the lightScene
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Invalid seapod id
-  #       '401':
-  #         description: Access denied. Not A member at the seapod
-  #       '404':
-  #         description: 'Seapod Not Found, User Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/lightining-scenes/{lightSceneId}/lightStatus':
-  #   put:
-  #     tags:
-  #       - Light Scenes
-  #     summary: Update Light Status
-  #     description: ''
-  #     operationId: updateLightStatus
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: Light information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             lightId:
-  #               type: integer
-  #           example:
-  #             lightId: 5f19a3f3a225d02fb8499557
-  #       - in: path
-  #         name: lightSceneId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the lightScene
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Invalid lightScene id
-  #       '404':
-  #         description: 'LightScene Not Found, User Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/lightining-scenes/{seapodId}/selected/{lightSceneId}':
-  #   put:
-  #     tags:
-  #       - Light Scenes
-  #     summary: Update Selected LightScene
-  #     description: ''
-  #     operationId: updateSelectedLightScene
-  #     parameters:
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: path
-  #         name: lightSceneId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the lightScene
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid lightScene id, Invalid seapod id'
-  #       '401':
-  #         description: Access denied. Not A member at the seapod
-  #       '404':
-  #         description: 'LightScene Not Found, User Not Found, Seapod Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /users/reset:
-  #   put:
-  #     tags:
-  #       - Users
-  #     summary: Reset Password
-  #     description: ''
-  #     operationId: resetPassword
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: current and new password
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             currentPassword:
-  #               type: string
-  #               pattern: >-
-  #                 ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
-  #             newPassword:
-  #               type: string
-  #               pattern: >-
-  #                 ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
-  #           example:
-  #             currentPassword: String@14*
-  #             newPassword: String@14/+
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: notificationToken
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: model
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           Current and new password are required, Password Validation failed,
-  #           current password is not correct
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /users/forget:
-  #   put:
-  #     tags:
-  #       - Users
-  #     summary: Forget Password
-  #     description: ''
-  #     operationId: forgetPassword
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: email
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             email:
-  #               type: string
-  #               format: email
-  #           example:
-  #             email: user@example.com
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /users:
-  #   put:
-  #     tags:
-  #       - Users
-  #     summary: Update Profile
-  #     description: ''
-  #     operationId: updateProfile
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: user information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             firstName:
-  #               type: string
-  #             lastName:
-  #               type: string
-  #             email:
-  #               type: string
-  #               format: email
-  #             mobileNumber:
-  #               type: string
-  #               pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
-  #             country:
-  #               type: string
-  #           example:
-  #             firstName: Name
-  #             lastName: Name
-  #             email: user@example.com
-  #             mobileNumber: '+201092101362'
-  #             country: Egypt
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /users/me/seapods:
-  #   get:
-  #     tags:
-  #       - Users
-  #     summary: Get User Seapods
-  #     description: ''
-  #     operationId: getUserSeapods
-  #     parameters:
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '404':
-  #         description: Seapod Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
+  /lightining-scenes/{seapodId}/intensity/{value}:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update LightScene Intensity
+      description: ''
+      operationId: updateLightSceneIntensity
+      parameters:
+        - name: value
+          in: path
+          description: 'Value of Intensity range from 0 to 100'
+          required: true
+          schema:
+            type: integer
+          example: 'local'
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id'
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'Seapod Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /lightining-scenes/{lightSceneId}/lightIntensity:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Light Intensity
+      description: ''
+      operationId: updateLightIntensity
+      requestBody:
+        required: true
+        description: A JSON object containing light
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/light'
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id'
+        '404':
+          description: 'LightScene Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /lightining-scenes/{seapodId}/status:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update LightScene Status (on/off)
+      description: ''
+      operationId: updateLightSceneStatus
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id'
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'Seapod Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /lightining-scenes/{lightSceneId}/lightStatus:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Light Status
+      description: ''
+      operationId: updateLightStatus
+      requestBody:
+        required: true
+        description: A JSON object containing light id
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lightId:
+                  type: string
+              example:
+                lightId: '5f6f45ce5ced392ed4c95e7e'
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id'
+        '404':
+          description: 'LightScene Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /lightining-scenes/{seapodId}/selected/{lightSceneId}:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Selected LightScene
+      description: ''
+      operationId: updateSelectedLightScene
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id, Invalid seapod id'
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'LightScene Not Found, User Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /lightining-scenes/{lightSceneId}/lightColor:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Color of Light
+      description: ''
+      operationId: updateLightColor
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id'
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'LightScene Not Found, User Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /users/reset:
+    put:
+      tags:
+        - Users
+      summary: Reset Password
+      description: ''
+      operationId: resetPassword
+      requestBody:
+        required: true
+        description: A JSON object containing current and new password
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  pattern: >-
+                    ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
+                newPassword:
+                  type: string
+                  pattern: >-
+                    ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
+              example:
+                currentPassword: String@14*
+                newPassword: String@14/+
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'  
+        - $ref: '#/components/parameters/notificationToken'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/model'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: >-
+            Current and new password are required, Password Validation failed,
+            current password is not correct
+        '404':
+          description: User Not Found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /users/forget:
+    put:
+      tags:
+        - Users
+      summary: Forget Password
+      description: ''
+      operationId: forgetPassword
+      requestBody:
+        required: true
+        description: A JSON object containing email
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              example:
+                email: user@example.com
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: User Not Found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /users:
+    put:
+      tags:
+        - Users
+      summary: Update Profile
+      description: ''
+      operationId: updateProfile
+      requestBody:
+        required: true
+        description: A JSON object containing email
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                mobileNumber:
+                  type: string
+                  pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
+                country:
+                  type: string
+              example:
+                firstName: Name
+                lastName: Name
+                email: user@example.com
+                mobileNumber: '+201092101362'
+                country: Egypt
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'  
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: User Not Found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /users/me/seapods:
+    get:
+      tags:
+        - Users
+      summary: Get User Seapods
+      description: ''
+      operationId: getUserSeapods
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'  
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Seapod Not Found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
   # '/permissions/{id}':
   #   post:
   #     tags:
