@@ -362,6 +362,14 @@ components:
       schema:
         type: string
       example: '6019ab90e332510015f377d7'
+    notificationId:
+      name: notificationId
+      in: path
+      description: Numeric ID of the notification
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
   
   # Reusable responses, such as 401 Unauthorized or 400 Bad Request
   responses:
@@ -1335,104 +1343,80 @@ paths:
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
   
-  # /users/notifications:
-  #   get:
-  #     tags:
-  #       - Notifications
-  #     summary: Get User Notifications
-  #     description: ''
-  #     operationId: getUserNotifications
-  #     parameters:
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   put:
-  #     tags:
-  #       - Notifications
-  #     summary: Update All Seen Status of Notifications
-  #     description: ''
-  #     operationId: updateAllStatusNotifications
-  #     parameters:
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/users/notifications/{notificationId}':
-  #   put:
-  #     tags:
-  #       - Notifications
-  #     summary: Toggle Seen Status of Notification by Id
-  #     description: ''
-  #     operationId: toggleStatusNotification
-  #     parameters:
-  #       - in: path
-  #         name: notificationId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Invalid Notification Id
-  #       '404':
-  #         description: Notification Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /users/notifications/settings:
-  #   put:
-  #     tags:
-  #       - Notifications
-  #     summary: Update Notification Settings
-  #     description: ''
-  #     operationId: updateNotificationSettings
-  #     parameters:
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
+  /users/notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get User Notifications
+      description: ''
+      operationId: getUserNotifications
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+    put:
+      tags:
+        - Notifications
+      summary: Update All Seen Status of Notifications
+      description: ''
+      operationId: updateAllStatusNotifications
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: User Not Found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /users/notifications/{notificationId}:
+    put:
+      tags:
+        - Notifications
+      summary: Toggle Seen Status of Notification by Id
+      description: ''
+      operationId: toggleStatusNotification
+      parameters:
+        - $ref: '#/components/parameters/notificationId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid Notification Id
+        '404':
+          description: Notification Not Found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
+  /users/notifications/settings:
+    put:
+      tags:
+        - Notifications
+      summary: Update Notification Settings
+      description: ''
+      operationId: updateNotificationSettings
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: User Not Found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
   # /users/emergency-contacts:
   #   put:
   #     tags:
