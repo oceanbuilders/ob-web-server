@@ -21,7 +21,7 @@ tags:
   - name: Users
   - name: Notifications
   - name: Emergency Contacts
-  - name: Permission
+  - name: Permissions
   - name: Access Requests
   
 components:
@@ -210,6 +210,90 @@ components:
       example:
         lightId: '5f19a3f3a225d02fb8499557'
         intensity: 80
+    permission:
+      type: object
+      properties:
+        Name:
+          type: string
+        Sets:
+          type: array
+          items:
+            type: object
+            properties:
+              Name:
+                type: string
+              Permissions:
+                type: object
+                properties:
+                  Status:
+                    type: string
+                    enum:
+                      - 'ON'
+                      - 'OFF'
+                      - EMERGENCY
+                  Name:
+                    type: string
+      example:
+        Name: close friend
+        Sets:
+          - Name: MainControls
+            Permissions:
+              - Status: 'ON'
+                Name: changeOrientation
+              - Status: 'ON'
+                Name: raiseLowerStairs
+              - Status: 'ON'
+                Name: frostWindows
+              - Status: 'ON'
+                Name: modifyACTemp
+              - Status: 'ON'
+                Name: doorsControl
+              - Status: 'ON'
+                Name: windowsControl
+              - Status: 'ON'
+                Name: smartWindowsControl
+              - Status: 'ON'
+                Name: powerSupply
+              - Status: 'ON'
+                Name: waterSupply
+              - Status: 'ON'
+                Name: audioSystem
+              - Status: 'ON'
+                Name: stove
+              - Status: 'ON'
+                Name: oven
+          - Name: Cameras
+            Permissions:
+              - Status: 'ON'
+                Name: kitchen
+              - Status: 'ON'
+                Name: livingRoom
+              - Status: 'ON'
+                Name: Bedroom
+          - Name: Lighting
+            Permissions:
+              - Status: 'ON'
+                Name: turnLights
+              - Status: 'ON'
+                Name: modifyIntensity
+              - Status: 'ON'
+                Name: switchLightscene
+              - Status: 'ON'
+                Name: addPersonalLightscene
+              - Status: 'ON'
+                Name: addGlobalLightscene
+              - Status: 'ON'
+                Name: manageGlobalLightscene
+          - Name: AccessManagement
+            Permissions:
+              - Status: 'ON'
+                Name: inviteGuests
+          - Name: SeapodInfo
+            Permissions:
+              - Status: 'ON'
+                Name: serialNumber
+              - Status: 'ON'
+                Name: modelInfoAndSpec
         
   # Reusable path, query, header and cookie parameters
   parameters:
@@ -266,6 +350,14 @@ components:
       name: lightSceneId
       in: path
       description: Numeric ID of the light scene
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    permissionId:
+      name: permissionId
+      in: path
+      description: Numeric ID of the permission
       required: true
       schema:
         type: string
@@ -908,7 +1000,7 @@ paths:
             Current and new password are required, Password Validation failed,
             current password is not correct
         '404':
-          description: User Not Found
+          description: 'User Not Found'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
           
@@ -934,9 +1026,9 @@ paths:
                 email: user@example.com
       responses:
         '200':
-          description: OK
+          description: 'OK'
         '404':
-          description: User Not Found
+          description: 'User Not Found'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
   
@@ -978,9 +1070,9 @@ paths:
         - $ref: '#/components/parameters/hardwareId'
       responses:
         '200':
-          description: OK
+          description: 'OK'
         '404':
-          description: User Not Found
+          description: 'User Not Found'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
   
@@ -996,494 +1088,253 @@ paths:
         - $ref: '#/components/parameters/hardwareId'
       responses:
         '200':
-          description: OK
+          description: 'OK'
         '404':
-          description: Seapod Not Found
+          description: 'Seapod Not Found'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
  
-  # '/permissions/{id}':
-  #   post:
-  #     tags:
-  #       - Permission
-  #     summary: Add new permission
-  #     description: ''
-  #     operationId: addNewPermission
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: Permission Information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             Name:
-  #               type: string
-  #             Sets:
-  #               type: array
-  #               items:
-  #                 type: object
-  #                 properties:
-  #                   Name:
-  #                     type: string
-  #                   Permissions:
-  #                     type: object
-  #                     properties:
-  #                       Status:
-  #                         type: string
-  #                         enum:
-  #                           - 'ON'
-  #                           - 'OFF'
-  #                           - EMERGENCY
-  #                       Name:
-  #                         type: string
-  #           example:
-  #             Name: close friend
-  #             Sets:
-  #               - Name: MainControls
-  #                 Permissions:
-  #                   - Status: 'ON'
-  #                     Name: changeOrientation
-  #                   - Status: 'ON'
-  #                     Name: raiseLowerStairs
-  #                   - Status: 'ON'
-  #                     Name: frostWindows
-  #                   - Status: 'ON'
-  #                     Name: modifyACTemp
-  #                   - Status: 'ON'
-  #                     Name: doorsControl
-  #                   - Status: 'ON'
-  #                     Name: windowsControl
-  #                   - Status: 'ON'
-  #                     Name: smartWindowsControl
-  #                   - Status: 'ON'
-  #                     Name: powerSupply
-  #                   - Status: 'ON'
-  #                     Name: waterSupply
-  #                   - Status: 'ON'
-  #                     Name: audioSystem
-  #                   - Status: 'ON'
-  #                     Name: stove
-  #                   - Status: 'ON'
-  #                     Name: oven
-  #               - Name: Cameras
-  #                 Permissions:
-  #                   - Status: 'ON'
-  #                     Name: kitchen
-  #                   - Status: 'ON'
-  #                     Name: livingRoom
-  #                   - Status: 'ON'
-  #                     Name: Bedroom
-  #               - Name: Lighting
-  #                 Permissions:
-  #                   - Status: 'ON'
-  #                     Name: turnLights
-  #                   - Status: 'ON'
-  #                     Name: modifyIntensity
-  #                   - Status: 'ON'
-  #                     Name: switchLightscene
-  #                   - Status: 'ON'
-  #                     Name: addPersonalLightscene
-  #                   - Status: 'ON'
-  #                     Name: addGlobalLightscene
-  #                   - Status: 'ON'
-  #                     Name: manageGlobalLightscene
-  #               - Name: AccessManagement
-  #                 Permissions:
-  #                   - Status: 'ON'
-  #                     Name: inviteGuests
-  #               - Name: SeapodInfo
-  #                 Permissions:
-  #                   - Status: 'ON'
-  #                     Name: serialNumber
-  #                   - Status: 'ON'
-  #                     Name: modelInfoAndSpec
-  #       - in: path
-  #         name: id
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           permission data is required, Invalid seapod Id, Duplicated
-  #           Permission Name
-  #       '403':
-  #         description: Access denied. Not the Owner of the seapod
-  #       '404':
-  #         description: 'Permission Not Found, Seapod Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   put:
-  #     tags:
-  #       - Permission
-  #     summary: Update permission
-  #     description: ''
-  #     operationId: updatePermission
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: Permission Information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             isDefault:
-  #               type: boolean
-  #             Name:
-  #               type: string
-  #             Sets:
-  #               type: array
-  #               items:
-  #                 type: object
-  #                 properties:
-  #                   Name:
-  #                     type: string
-  #                   Permissions:
-  #                     type: object
-  #                     properties:
-  #                       Status:
-  #                         type: string
-  #                         enum:
-  #                           - 'ON'
-  #                           - 'OFF'
-  #                           - EMERGENCY
-  #                       Name:
-  #                         type: string
-  #           example:
-  #             isDefault: false
-  #             Name: close friend
-  #             Sets:
-  #               - Name: MainControls
-  #                 Permissions:
-  #                   - Status: 'OFF'
-  #                     Name: changeOrientation
-  #                   - Status: 'OFF'
-  #                     Name: raiseLowerStairs
-  #                   - Status: 'OFF'
-  #                     Name: frostWindows
-  #                   - Status: 'ON'
-  #                     Name: modifyACTemp
-  #                   - Status: 'ON'
-  #                     Name: doorsControl
-  #                   - Status: 'ON'
-  #                     Name: windowsControl
-  #                   - Status: 'ON'
-  #                     Name: smartWindowsControl
-  #                   - Status: 'ON'
-  #                     Name: powerSupply
-  #                   - Status: 'ON'
-  #                     Name: waterSupply
-  #                   - Status: 'ON'
-  #                     Name: audioSystem
-  #                   - Status: 'ON'
-  #                     Name: stove
-  #                   - Status: 'ON'
-  #                     Name: oven
-  #               - Name: Cameras
-  #                 Permissions:
-  #                   - Status: 'ON'
-  #                     Name: kitchen
-  #                   - Status: 'ON'
-  #                     Name: livingRoom
-  #                   - Status: 'ON'
-  #                     Name: Bedroom
-  #               - Name: Lighting
-  #                 Permissions:
-  #                   - Status: 'ON'
-  #                     Name: turnLights
-  #                   - Status: 'ON'
-  #                     Name: modifyIntensity
-  #                   - Status: 'ON'
-  #                     Name: switchLightscene
-  #                   - Status: 'ON'
-  #                     Name: addPersonalLightscene
-  #                   - Status: 'ON'
-  #                     Name: addGlobalLightscene
-  #                   - Status: 'ON'
-  #                     Name: manageGlobalLightscene
-  #               - Name: AccessManagement
-  #                 Permissions:
-  #                   - Status: 'ON'
-  #                     Name: inviteGuests
-  #               - Name: SeapodInfo
-  #                 Permissions:
-  #                   - Status: 'ON'
-  #                     Name: serialNumber
-  #                   - Status: 'ON'
-  #                     Name: modelInfoAndSpec
-  #       - in: path
-  #         name: id
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           permission data is required, Invalid seapod Id, Duplicated
-  #           Permission Name, Default Permission cannot be updated
-  #       '403':
-  #         description: Access denied. Not the Owner of the seapod
-  #       '404':
-  #         description: 'Permission Not Found, Seapod Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   get:
-  #     tags:
-  #       - Permission
-  #     summary: Get Permission By Id
-  #     description: ''
-  #     operationId: getPermissionById
-  #     parameters:
-  #       - in: path
-  #         name: id
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the permission
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Invalid permission Id
-  #       '404':
-  #         description: Permission Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/permissions/{permissionId}/seapod/{seapodId}/name':
-  #   put:
-  #     tags:
-  #       - Permission
-  #     summary: Rename permission
-  #     description: ''
-  #     operationId: renamePermission
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: Permission Information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             Name:
-  #               type: string
-  #           example:
-  #             Name: close friend
-  #       - in: path
-  #         name: permissionId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the permission
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           permission name is required, Invalid seapod Id, Invalid permission
-  #           Id, Duplicated Permission Name, Default Permission cannot be renamed
-  #       '403':
-  #         description: Access denied. Not the Owner of the seapod
-  #       '404':
-  #         description: 'Permission Not Found, Seapod Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/permissions/{permissionId}/seapod/{seapodId}':
-  #   delete:
-  #     tags:
-  #       - Permission
-  #     summary: Delete permission
-  #     description: ''
-  #     operationId: deletePermission
-  #     parameters:
-  #       - in: path
-  #         name: permissionId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the permission
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           Invalid seapod Id, Invalid permission Id, Default Permission cannot
-  #           be deleted
-  #       '403':
-  #         description: Access denied. Not the Owner of the seapod
-  #       '404':
-  #         description: 'Permission Not Found, Seapod Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/permissions/{seapodId}/user':
-  #   put:
-  #     tags:
-  #       - Permission
-  #     summary: Add permission to user
-  #     description: ''
-  #     operationId: addPermissionToUser
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: User Id and Seapod Id
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             userId:
-  #               type: string
-  #             permissionId:
-  #               type: string
-  #           example:
-  #             userId: 5ee8d9425d63472dd45d88d4
-  #             permissionId: 5ee8ded5385e1722008f3366
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid seapod Id, Invalid permission Id, Invalid user Id'
-  #       '403':
-  #         description: Access denied. Not the Owner of the seapod
-  #       '404':
-  #         description: 'Permission Not Found, Seapod Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   delete:
-  #     tags:
-  #       - Permission
-  #     summary: Revoke permission from user
-  #     description: ''
-  #     operationId: revokePermissionFromUser
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: User Id
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             userId:
-  #               type: string
-  #           example:
-  #             userId: 5ee8d9425d63472dd45d88d4
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid seapod Id, Invalid permission Id, Invalid user Id'
-  #       '403':
-  #         description: Access denied. Not the Owner of the seapod
-  #       '404':
-  #         description: 'Permission Not Found, Seapod Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/permissions/{seapodId}/seapod':
-  #   get:
-  #     tags:
-  #       - Permission
-  #     summary: Get Seapod Permissions
-  #     description: ''
-  #     operationId: getSeapodPermissions
-  #     parameters:
-  #       - in: path
-  #         name: seapodId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Invalid seapod Id
-  #       '404':
-  #         description: Seapod Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
+  /permissions/{seapodId}:
+    post:
+      tags:
+        - Permissions
+      summary: Add new permission
+      description: ''
+      operationId: addNewPermission
+      requestBody:
+        required: true
+        description: A JSON object containing light
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/permission'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'    
+      responses:
+        '201':
+          description: 'Created Successfully'
+        '400':
+          description: >-
+            permission data is required, Invalid seapod Id, Duplicated
+            Permission Name
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+    put:
+      tags:
+        - Permissions
+      summary: Update permission
+      description: ''
+      operationId: updatePermission
+      requestBody:
+        required: true
+        description: A JSON object containing light
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/permission'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId' 
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            permission data is required, Invalid seapod Id, Duplicated
+            Permission Name, Default Permission cannot be updated
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+
+  /permissions/{permissionId}/seapod/{seapodId}/name:
+    put:
+      tags:
+        - Permissions
+      summary: Rename permission
+      description: ''
+      operationId: renamePermission
+      requestBody:
+        required: true
+        description: A JSON object containing new name
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  type: string
+              example:
+                Name: 'Close Friends Permission'
+      parameters:
+        - $ref: '#/components/parameters/permissionId'
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId' 
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            permission name is required, Invalid seapod Id, Invalid permission
+            Id, Duplicated Permission Name, Default Permission cannot be renamed
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /permissions/{permissionId}/seapod/{seapodId}:
+    delete:
+      tags:
+        - Permissions
+      summary: Delete permission
+      description: ''
+      operationId: deletePermission
+      parameters:
+        - $ref: '#/components/parameters/permissionId'
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId' 
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            Invalid seapod Id, Invalid permission Id, Default Permission cannot
+            be deleted
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /permissions/{seapodId}/user:
+    put:
+      tags:
+        - Permissions
+      summary: Add permission to user
+      description: ''
+      operationId: addPermissionToUser
+      requestBody:
+        required: true
+        description: A JSON object containing User Id and Seapod Id
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                permissionId:
+                  type: string
+              example:
+                userId: '5ee8d9425d63472dd45d88d4'
+                permissionId: '5ee8ded5385e1722008f3366'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod Id, Invalid permission Id, Invalid user Id'
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+    delete:
+      tags:
+        - Permissions
+      summary: Revoke permission from user
+      description: ''
+      operationId: revokePermissionFromUser
+      # requestBody:
+      #   required: true
+      #   description: A JSON object containing User Id
+      #   content:
+      #     application/json:
+      #       schema:
+      #         type: object
+      #         properties:
+      #           userId:
+      #             type: string
+      #         example:
+      #           userId: '5ee8d9425d63472dd45d88d4'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod Id, Invalid permission Id, Invalid user Id'
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+  /permissions/{seapodId}/seapod:
+    get:
+      tags:
+        - Permissions
+      summary: Get Seapod Permissions
+      description: ''
+      operationId: getSeapodPermissions
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod Id'
+        '404':
+          description: 'Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /permissions/{permissionId}:
+    get:
+      tags:
+        - Permissions
+      summary: Get Permission By Id
+      description: ''
+      operationId: getPermissionById
+      parameters:
+        - $ref: '#/components/parameters/permissionId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid permission Id'
+        '404':
+          description: 'Permission Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
   # /users/notifications:
   #   get:
   #     tags:
