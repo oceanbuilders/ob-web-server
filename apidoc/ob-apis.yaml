@@ -294,6 +294,45 @@ components:
                 Name: serialNumber
               - Status: 'ON'
                 Name: modelInfoAndSpec
+    emergencyContact:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        mobileNumber:
+          type: string
+          pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
+      example:
+        firstName: Name
+        lastName: Name
+        email: user@example.com
+        mobileNumber: '+201092101362'
+    requestAccess:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - GUEST
+            - MEMBER
+            - VISITOR
+            - OWNER
+        period:
+          type: integer
+        vessleCode:
+          type: string
+        checkIn:
+          type: integer
+      example:
+        type: GUEST
+        period: 86400000
+        vessleCode: S0F83ED
+        checkIn: 1581191756216
         
   # Reusable path, query, header and cookie parameters
   parameters:
@@ -370,6 +409,30 @@ components:
       schema:
         type: string
       example: '6019ab90e332510015f377d7'
+    emergencyContactId:
+      name: emergencyContactId
+      in: path
+      description: Numeric ID of the emergency contact
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    accessRequestId:
+      name: accessRequestId
+      in: path
+      description: Numeric ID of the access request
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    accessInvitationId:
+      name: accessInvitationId
+      in: path
+      description: Numeric ID of the access invitation
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
   
   # Reusable responses, such as 401 Unauthorized or 400 Bad Request
   responses:
@@ -436,7 +499,7 @@ paths:
       operationId: login
       requestBody:
         required: true
-        description: A JSON object containing user information and seapod information
+        description: A JSON object containing user login info
         content:
           application/json:
             schema:
@@ -547,7 +610,7 @@ paths:
       operationId: createSeapod
       requestBody:
         required: true
-        description: A JSON object containing user id
+        description: A JSON object containing seapod information
         content:
           application/json:
             schema:
@@ -1049,7 +1112,7 @@ paths:
       operationId: updateProfile
       requestBody:
         required: true
-        description: A JSON object containing email
+        description: A JSON object containing new profile information
         content:
           application/json:
             schema:
@@ -1111,7 +1174,7 @@ paths:
       operationId: addNewPermission
       requestBody:
         required: true
-        description: A JSON object containing light
+        description: A JSON object containing permission information
         content:
           application/json:
             schema:
@@ -1142,7 +1205,7 @@ paths:
       operationId: updatePermission
       requestBody:
         required: true
-        description: A JSON object containing light
+        description: A JSON object containing permission information
         content:
           application/json:
             schema:
@@ -1238,7 +1301,7 @@ paths:
       operationId: addPermissionToUser
       requestBody:
         required: true
-        description: A JSON object containing User Id and Seapod Id
+        description: A JSON object containing User Id and Permission Id
         content:
           application/json:
             schema:
@@ -1372,9 +1435,9 @@ paths:
         - $ref: '#/components/parameters/hardwareId'
       responses:
         '200':
-          description: OK
+          description: 'OK'
         '404':
-          description: User Not Found
+          description: 'User Not Found'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
   
@@ -1391,11 +1454,11 @@ paths:
         - $ref: '#/components/parameters/hardwareId'
       responses:
         '200':
-          description: OK
+          description: 'OK'
         '400':
-          description: Invalid Notification Id
+          description: 'Invalid Notification Id'
         '404':
-          description: Notification Not Found
+          description: 'Notification Not Found'
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
  
@@ -1417,587 +1480,425 @@ paths:
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
   
-  # /users/emergency-contacts:
-  #   put:
-  #     tags:
-  #       - Emergency Contacts
-  #     summary: Add Emergency Contact
-  #     description: ''
-  #     operationId: addEmergencyContact
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: emergency contact information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             firstName:
-  #               type: string
-  #             lastName:
-  #               type: string
-  #             email:
-  #               type: string
-  #               format: email
-  #             mobileNumber:
-  #               type: string
-  #               pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
-  #           example:
-  #             firstName: Name
-  #             lastName: Name
-  #             email: user@example.com
-  #             mobileNumber: '+201092101362'
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/users/emergency-contacts/{emergencyContactId}':
-  #   put:
-  #     tags:
-  #       - Emergency Contacts
-  #     summary: Update Emergency Contact by Id
-  #     description: ''
-  #     operationId: updateEmergencyContact
-  #     parameters:
-  #       - in: path
-  #         name: emergencyContactId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the emergencyContact
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   delete:
-  #     tags:
-  #       - Emergency Contacts
-  #     summary: Delete Emergency Contact by Id
-  #     description: ''
-  #     operationId: deleteEmergencyContact
-  #     parameters:
-  #       - in: path
-  #         name: emergencyContactId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the emergencyContact
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Your are not allowed to remove all emergency contacts
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /access-requests/existing:
-  #   post:
-  #     tags:
-  #       - Access Requests
-  #     summary: Send Access Request for Existing Users
-  #     description: ''
-  #     operationId: sendAccessRequestForExistingUsers
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: Access Request Information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             type:
-  #               type: string
-  #               enum:
-  #                 - GUEST
-  #                 - MEMBER
-  #                 - VISITOR
-  #                 - OWNER
-  #             period:
-  #               type: integer
-  #             vessleCode:
-  #               type: string
-  #             checkIn:
-  #               type: integer
-  #           example:
-  #             type: GUEST
-  #             period: 86400000
-  #             vessleCode: S0F83ED
-  #             checkIn: 1581191756216
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid Token, Body is required, request validation faild'
-  #       '401':
-  #         description: No token is provided
-  #       '403':
-  #         description: >-
-  #           Forbidden. Access denied, You are not allowed to update this request
-  #           at the current time
-  #       '404':
-  #         description: 'User Not Found, Seapod Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /access-requests/new:
-  #   post:
-  #     tags:
-  #       - Access Requests
-  #     summary: Send Access Request for New Users
-  #     description: ''
-  #     operationId: sendAccessRequestForNewUsers
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: New User Information and Access Request Information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             user:
-  #               type: object
-  #               properties:
-  #                 firstName:
-  #                   type: string
-  #                 lastName:
-  #                   type: string
-  #                 email:
-  #                   type: string
-  #                   format: email
-  #                 mobileNumber:
-  #                   type: string
-  #                   pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
-  #                 country:
-  #                   type: string
-  #             request:
-  #               type: object
-  #               properties:
-  #                 type:
-  #                   type: string
-  #                   enum:
-  #                     - GUEST
-  #                     - MEMBER
-  #                     - VISITOR
-  #                     - OWNER
-  #                 period:
-  #                   type: integer
-  #                 vessleCode:
-  #                   type: string
-  #                 checkIn:
-  #                   type: integer
-  #           example:
-  #             user:
-  #               firstName: Name
-  #               lastName: Name
-  #               email: user@example.com
-  #               mobileNumber: '+201092101362'
-  #               password: String@14*
-  #               country: Spain
-  #             request:
-  #               type: GUEST
-  #               period: 86400000
-  #               vessleCode: SAA843C
-  #               checkIn: 1581191756216
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           Invalid Token, Body is required, request validation faild, user
-  #           validation failed
-  #       '401':
-  #         description: No token is provided
-  #       '403':
-  #         description: Forbidden. Access denied
-  #       '404':
-  #         description: Seapod Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/access-requests/{accessRequestId}/approval':
-  #   put:
-  #     tags:
-  #       - Access Requests
-  #     summary: Accept Access Request
-  #     description: ''
-  #     operationId: acceptAccessRequest
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: New User Information and Access Request Information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             type:
-  #               type: string
-  #               enum:
-  #                 - GUEST
-  #                 - MEMBER
-  #                 - VISITOR
-  #                 - OWNER
-  #             period:
-  #               type: integer
-  #             permissionSetId:
-  #               type: integer
-  #           example:
-  #             type: MEMBER
-  #             period: 0
-  #             permissionSetId: 5efdb15aeca70a1378c674ac
-  #       - in: path
-  #         name: accessRequestId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the AccessRequest
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           Invalid Token, Body is required, Invalid Access Request Id, request
-  #           validation failed
-  #       '401':
-  #         description: No token is provided
-  #       '403':
-  #         description: >-
-  #           Forbidden. Access denied, Not the owner. Your are not allowed to
-  #           take this action on the current seapod
-  #       '404':
-  #         description: Request Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/access-requests/{accessRequestId}/rejection':
-  #   put:
-  #     tags:
-  #       - Access Requests
-  #     summary: Reject Access Request
-  #     description: ''
-  #     operationId: rejectAccessRequest
-  #     parameters:
-  #       - in: path
-  #         name: accessRequestId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the AccessRequest
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid Token, Invalid Access Request Id'
-  #       '401':
-  #         description: No token is provided
-  #       '403':
-  #         description: >-
-  #           Forbidden. Access denied, Not the owner. Your are not allowed to
-  #           take this action on the current seapod
-  #       '404':
-  #         description: Request Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/access-requests/{accessRequestId}':
-  #   put:
-  #     tags:
-  #       - Access Requests
-  #     summary: Cancel Access Request
-  #     description: ''
-  #     operationId: cancelAccessRequest
-  #     parameters:
-  #       - in: path
-  #         name: accessRequestId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the AccessRequest
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid Token, Invalid Access Request Id'
-  #       '401':
-  #         description: No token is provided
-  #       '403':
-  #         description: >-
-  #           Forbidden. Access denied, Not the owner. Your are not allowed to
-  #           take this action on the current seapod
-  #       '404':
-  #         description: Request Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   get:
-  #     tags:
-  #       - Access Requests
-  #     summary: Get Access Request by Id
-  #     description: ''
-  #     operationId: getAccessRequestById
-  #     parameters:
-  #       - in: path
-  #         name: accessRequestId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the AccessRequest
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Invalid Request Access Id
-  #       '404':
-  #         description: Request Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # /access-requests/user:
-  #   get:
-  #     tags:
-  #       - Access Requests
-  #     summary: Get All Access Requests & Invitations of User
-  #     description: ''
-  #     operationId: getAllAccessRequestsAndInvitations
-  #     parameters:
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '404':
-  #         description: User Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/access-requests/invitations/{accessInvitationId}/approval':
-  #   put:
-  #     tags:
-  #       - Access Requests
-  #     summary: Accept Access Invitation
-  #     description: ''
-  #     operationId: acceptAccessInvitation
-  #     parameters:
-  #       - in: path
-  #         name: accessInvitationId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the AccessInvitation
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid Token, Invalid Access Invityation Id'
-  #       '401':
-  #         description: No token is provided
-  #       '403':
-  #         description: >-
-  #           Forbidden. Access denied, Not the owner. Your are not allowed to
-  #           take this action on the current seapod
-  #       '404':
-  #         description: Request Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/access-requests/invitations/{accessInvitationId}/rejection':
-  #   put:
-  #     tags:
-  #       - Access Requests
-  #     summary: Reject Access Invitation
-  #     description: ''
-  #     operationId: rejectAccessInvitation
-  #     parameters:
-  #       - in: path
-  #         name: accessInvitationId
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the AccessInvitation
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid Token, Invalid Access Request Id'
-  #       '401':
-  #         description: No token is provided
-  #       '403':
-  #         description: >-
-  #           Forbidden. Access denied, Not the owner. Your are not allowed to
-  #           take this action on the current seapod
-  #       '404':
-  #         description: Request Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  # '/access-requests/invitations/{id}':
-  #   put:
-  #     tags:
-  #       - Access Requests
-  #     summary: Cancel Access Invitaion
-  #     description: ''
-  #     operationId: cancelAccessInvitation
-  #     parameters:
-  #       - in: path
-  #         name: id
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the AccessInvitation
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: 'Invalid Token, Invalid Access Invitation Id'
-  #       '401':
-  #         description: No token is provided
-  #       '403':
-  #         description: >-
-  #           Forbidden. Access denied, Not the owner. Your are not allowed to
-  #           take this action on the current seapod
-  #       '404':
-  #         description: Request Not Found
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
-  #   post:
-  #     tags:
-  #       - Access Requests
-  #     summary: Send Access Invitation and Add Member
-  #     description: ''
-  #     operationId: addMember
-  #     parameters:
-  #       - in: body
-  #         name: body
-  #         description: New User Information and Access Request Information
-  #         required: true
-  #         schema:
-  #           type: object
-  #           properties:
-  #             email:
-  #               type: string
-  #               format: email
-  #             permissionSetId:
-  #               type: integer
-  #           example:
-  #             email: user@example.com
-  #             permissionSetId: 5f10cb0ce2e070213c7d0368
-  #       - in: path
-  #         name: id
-  #         type: string
-  #         required: true
-  #         description: Numeric ID of the seapod
-  #       - in: header
-  #         name: x-auth-token
-  #         type: string
-  #         required: true
-  #       - in: header
-  #         name: hardwareId
-  #         type: string
-  #         required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: >-
-  #           Invalid Token, Body is required, Invalid seapod Id, Email Validation
-  #           faild, This user have an already invitation to access your SeaPod
-  #       '401':
-  #         description: >-
-  #           No token is provided, Access denied. You are not allowed to do this
-  #           operation
-  #       '403':
-  #         description: Forbidden. Access denied
-  #       '404':
-  #         description: 'User Not Found, Seapod Not Found'
-  #       '500':
-  #         description: 'Internal Server Error, Header Parameters is missing'
+  /users/emergency-contacts:
+    put:
+      tags:
+        - Emergency Contacts
+      summary: Add Emergency Contact
+      description: ''
+      operationId: addEmergencyContact
+      requestBody:
+        required: true
+        description: A JSON object containing emergency contact information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/emergencyContact'
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /users/emergency-contacts/{emergencyContactId}:
+    put:
+      tags:
+        - Emergency Contacts
+      summary: Update Emergency Contact by Id
+      description: ''
+      operationId: updateEmergencyContact
+      parameters:
+        - $ref: '#/components/parameters/emergencyContactId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+    delete:
+      tags:
+        - Emergency Contacts
+      summary: Delete Emergency Contact by Id
+      description: ''
+      operationId: deleteEmergencyContact
+      parameters:
+        - $ref: '#/components/parameters/emergencyContactId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your are not allowed to remove all emergency contacts'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/existing:
+    post:
+      tags:
+        - Access Requests
+      summary: Send Access Request for Existing Users
+      description: ''
+      operationId: sendAccessRequestForExistingUsers
+      requestBody:
+        required: true
+        description: A JSON object containing request access information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestAccess'
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Body is required, request validation faild'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, You are not allowed to update this request
+            at the current time
+        '404':
+          description: 'User Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/new:
+    post:
+      tags:
+        - Access Requests
+      summary: Send Access Request for New Users
+      description: ''
+      operationId: sendAccessRequestForNewUsers
+      requestBody:
+        required: true
+        description: A JSON object containing user information and access request information
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/user'
+                  seaPod:
+                    $ref: '#/components/schemas/requestAccess'
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            Invalid Token, Body is required, request validation faild, user
+            validation failed
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: 'Forbidden. Access denied'
+        '404':
+          description: 'Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/{accessRequestId}/approval:
+    put:
+      tags:
+        - Access Requests
+      summary: Accept Access Request
+      description: ''
+      operationId: acceptAccessRequest
+      requestBody:
+        required: true
+        description: A JSON object containing request access acceptance information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - GUEST
+                    - MEMBER
+                    - VISITOR
+                    - OWNER
+                period:
+                  type: integer
+                permissionSetId:
+                  type: integer
+              example:
+                type: MEMBER
+                period: 0
+                permissionSetId: '5efdb15aeca70a1378c674ac'
+      parameters:
+        - $ref: '#/components/parameters/accessRequestId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: >-
+            Invalid Token, Body is required, Invalid Access Request Id, request
+            validation failed
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/{accessRequestId}/rejection:
+    put:
+      tags:
+        - Access Requests
+      summary: Reject Access Request
+      description: ''
+      operationId: rejectAccessRequest
+      parameters:
+        - $ref: '#/components/parameters/accessRequestId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Request Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
+  /access-requests/{accessRequestId}:
+    put:
+      tags:
+        - Access Requests
+      summary: Cancel Access Request
+      description: ''
+      operationId: cancelAccessRequest
+      parameters:
+        - $ref: '#/components/parameters/accessRequestId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Request Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+    get:
+      tags:
+        - Access Requests
+      summary: Get Access Request by Id
+      description: ''
+      operationId: getAccessRequestById
+      parameters:
+        - $ref: '#/components/parameters/accessRequestId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Request Access Id'
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
+  /access-requests/user:
+    get:
+      tags:
+        - Access Requests
+      summary: Get All Access Requests & Invitations of User
+      description: ''
+      operationId: getAllAccessRequestsAndInvitations
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
+  /access-requests/invitations/{seapodId}:    
+    post:
+      tags:
+        - Access Requests
+      summary: Send Access Invitation and Add Member
+      description: ''
+      operationId: addMember
+      requestBody:
+        required: true
+        description: A JSON object containing invitation information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                message:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                period:
+                  type: integer  
+                type:
+                  type: string
+                  enum:
+                    - GUEST
+                    - MEMBER
+                    - VISITOR
+                    - OWNER
+                permissionSetId:
+                  type: integer
+              example:
+                name: Ola
+                message: Come join me?
+                email: iolagalal97@gmail.com
+                period: 0
+                type: MEMBER
+                checkIn: 1594131437830
+                permissionSetId: 60368ed1ff5d290fc5df52b0
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: >-
+            Invalid Token, Body is required, Invalid seapod Id, Email Validation
+            faild, This user have an already invitation to access your SeaPod
+        '401':
+          description: >-
+            No token is provided, Access denied. You are not allowed to do this
+            operation
+        '403':
+          description: 'Forbidden. Access denied'
+        '404':
+          description: 'User Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /access-requests/invitations/{accessInvitationId}/approval:
+    put:
+      tags:
+        - Access Requests
+      summary: Accept Access Invitation
+      description: ''
+      operationId: acceptAccessInvitation
+      parameters:
+        - $ref: '#/components/parameters/accessInvitationId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Invityation Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/invitations/{accessInvitationId}/rejection:
+    put:
+      tags:
+        - Access Requests
+      summary: Reject Access Invitation
+      description: ''
+      operationId: rejectAccessInvitation
+      parameters:
+        - $ref: '#/components/parameters/accessInvitationId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Request Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/invitations/{accessInvitationId}:
+    put:
+      tags:
+        - Access Requests
+      summary: Cancel Access Invitaion
+      description: ''
+      operationId: cancelAccessInvitation
+      parameters:
+        - $ref: '#/components/parameters/accessInvitationId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Invitation Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
