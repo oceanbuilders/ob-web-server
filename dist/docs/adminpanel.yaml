@@ -16,12 +16,7 @@ servers:
 tags:
   - name: Auth
   - name: Seapods
-  - name: Light Scenes
   - name: Users
-  - name: Permission
-  - name: Notifications
-  - name: Access Requests
-  - name: Emergency Contacts
   
 components:
   # Reusable schemas (data models)
@@ -153,7 +148,185 @@ components:
       example:
         email: user@example.com
         password: String@14*
-    
+    lightScene:
+      type: object
+      properties: 
+        source:
+          type: string
+        sceneName:
+          type: string
+        rooms:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              moodes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    lightName:
+                      type: string
+                    lightColor:
+                      type: string
+                      pattern: '^0xFF[A-F0-9]{6}$'
+                    status:
+                      type: boolean
+                    brightness:
+                      type: integer
+                      minimum: 0
+                      maximum: 100
+      example:
+        source: seapod
+        sceneName: Day Mode
+        rooms:
+          - label: BedRoom
+            moodes:
+              - lightName: Lightstrip 1
+                lightColor: '0xFF9B9591'
+                status: false
+                brightness: 30
+              - lightName: Lightstrip 2
+                lightColor: '0xFF123456'
+                status: true
+                brightness: 50
+    light:
+      type: object
+      properties:
+        lightId:
+          type: integer
+        intensity:
+          type: integer
+          minimum: 0
+          maximum: 100
+      example:
+        lightId: '5f19a3f3a225d02fb8499557'
+        intensity: 80
+    permission:
+      type: object
+      properties:
+        Name:
+          type: string
+        Sets:
+          type: array
+          items:
+            type: object
+            properties:
+              Name:
+                type: string
+              Permissions:
+                type: object
+                properties:
+                  Status:
+                    type: string
+                    enum:
+                      - 'ON'
+                      - 'OFF'
+                      - EMERGENCY
+                  Name:
+                    type: string
+      example:
+        Name: close friend
+        Sets:
+          - Name: MainControls
+            Permissions:
+              - Status: 'ON'
+                Name: changeOrientation
+              - Status: 'ON'
+                Name: raiseLowerStairs
+              - Status: 'ON'
+                Name: frostWindows
+              - Status: 'ON'
+                Name: modifyACTemp
+              - Status: 'ON'
+                Name: doorsControl
+              - Status: 'ON'
+                Name: windowsControl
+              - Status: 'ON'
+                Name: smartWindowsControl
+              - Status: 'ON'
+                Name: powerSupply
+              - Status: 'ON'
+                Name: waterSupply
+              - Status: 'ON'
+                Name: audioSystem
+              - Status: 'ON'
+                Name: stove
+              - Status: 'ON'
+                Name: oven
+          - Name: Cameras
+            Permissions:
+              - Status: 'ON'
+                Name: kitchen
+              - Status: 'ON'
+                Name: livingRoom
+              - Status: 'ON'
+                Name: Bedroom
+          - Name: Lighting
+            Permissions:
+              - Status: 'ON'
+                Name: turnLights
+              - Status: 'ON'
+                Name: modifyIntensity
+              - Status: 'ON'
+                Name: switchLightscene
+              - Status: 'ON'
+                Name: addPersonalLightscene
+              - Status: 'ON'
+                Name: addGlobalLightscene
+              - Status: 'ON'
+                Name: manageGlobalLightscene
+          - Name: AccessManagement
+            Permissions:
+              - Status: 'ON'
+                Name: inviteGuests
+          - Name: SeapodInfo
+            Permissions:
+              - Status: 'ON'
+                Name: serialNumber
+              - Status: 'ON'
+                Name: modelInfoAndSpec
+    emergencyContact:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        mobileNumber:
+          type: string
+          pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
+      example:
+        firstName: Name
+        lastName: Name
+        email: user@example.com
+        mobileNumber: '+201092101362'
+    requestAccess:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - GUEST
+            - MEMBER
+            - VISITOR
+            - OWNER
+        period:
+          type: integer
+        vessleCode:
+          type: string
+        checkIn:
+          type: integer
+      example:
+        type: GUEST
+        period: 86400000
+        vessleCode: S0F83ED
+        checkIn: 1581191756216
         
   # Reusable path, query, header and cookie parameters
   parameters:
@@ -182,27 +355,155 @@ components:
       schema:
         type: string
       required: true
-  
-  # Reusable responses, such as 401 Unauthorized or 400 Bad Request
-  responses:
-    404UserNotFound:
-      description: ''
-      content:
-        application/json:
-          schema:
-            type: object
-            properties: 
-              message:
-                type: string
-            example: 
-              message: User Not Found
+    seapodId:
+      name: seapodId
+      in: path
+      description: Numeric ID of the seapod
+      required: true
+      schema:
+        type: string
+      example: '5f6f45ce5ced392ed4c95e7e'
+    userId:
+      name: userId
+      in: path
+      description: Numeric ID of the user
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    vesselCode:
+      name: vesselCode
+      in: path
+      description: Vessel Code of Seapod
+      required: true
+      schema:
+        type: string
+      example: 'S7798A7'
+    lightSceneId:
+      name: lightSceneId
+      in: path
+      description: Numeric ID of the light scene
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    permissionId:
+      name: permissionId
+      in: path
+      description: Numeric ID of the permission
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    notificationId:
+      name: notificationId
+      in: path
+      description: Numeric ID of the notification
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    emergencyContactId:
+      name: emergencyContactId
+      in: path
+      description: Numeric ID of the emergency contact
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    accessRequestId:
+      name: accessRequestId
+      in: path
+      description: Numeric ID of the access request
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    accessInvitationId:
+      name: accessInvitationId
+      in: path
+      description: Numeric ID of the access invitation
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
     
 paths:
+  /admins/registration:
+    post:
+      tags:
+        - Auth
+      summary: Create new admin
+      description: ''
+      operationId: createAdmin
+      requestBody:
+        required: true
+        description: A JSON object containing admin information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+      parameters:
+        - $ref: '#/components/parameters/notificationToken'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/model'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Error'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /admins/auth:
+    put:
+      tags:
+        - Auth
+      summary: Login using email and password of admin account
+      description: ''
+      operationId: loginAdmin
+      requestBody:
+        required: true
+        description: A JSON object containing admin login information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginUser'
+      parameters:
+        - $ref: '#/components/parameters/notificationToken'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/model'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid email or password'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /admins/me:
+    get:
+      tags:
+        - Auth
+      summary: Login with token
+      description: ''
+      operationId: autoLoginAdmin
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your email and password combination was incorrect. Please try again.'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
   /seapods:
     get:
       tags:
         - Seapods
-      summary: Get All Seapods - Only for Admins
+      summary: Get All Seapods
       description: ''
       operationId: getAllSeapods
       parameters:
@@ -230,3 +531,23 @@ paths:
           description: 'OK'
         '500':
           description: 'Internal Server Error' 
+          
+  /seapods/{seapodId}/owner:
+    get:
+      tags:
+        - Seapods
+      summary: Get Seapod's Owner Info by Seapod Id
+      description: ''
+      operationId: getSeapodOwner
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/seapodId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Seapod Not Found.'  
+        '500':
+          description: 'Internal Server Error' 
+  
