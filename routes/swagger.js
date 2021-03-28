@@ -10,12 +10,12 @@ router.use(bodyParser.urlencoded({
 }));
 
 swagger.setApiInfo({
-	title: "Ocean Builder API",
+	title: "Ocean Builder APIs",
 	Ydescription: "This system is designed to enable users to have controls on Ocean builders seapods...",
-	termsOfServiceUrl: "",
-	contact: "diego@oceanbuilders.com",
-	license: "",
-	licenseUrl: ""
+	termsOfServiceUrl: "https://oceanbuilders.com/terms/",
+	contact: "ola@oceanbuilders.io",
+	license: "Apache 2.0",
+	licenseUrl: "http://www.apache.org/licenses/LICENSE-2.0.html"
 });
 
 router.get('/', function (req, res) {

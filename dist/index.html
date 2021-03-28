@@ -40,7 +40,11 @@
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
         validatorUrl: null,        
-        url: "./api-docs.json",
+        urls: [
+            {url: "./docs/web-server.yaml", name: "Main Server APIs"},
+            {url: "./docs/adminpanel.yaml", name: "Admin Panel APIs"},
+            {url: "./docs/lightsControl.yaml", name: "Lights Control APIs"},
+        ],
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [

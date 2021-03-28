@@ -1,0 +1,1904 @@
+openapi: 3.0.0
+info:
+  description: >-
+    This is a API documentation for OB server.  You can find out more about
+    Ocean Builders at [https://ocean.builders/](https://ocean.builders/)
+  version: 0.8.0
+  title: 'Ocean Builder APIs'
+  termsOfService: 'https://oceanbuilders.com/terms/'
+  contact:
+    email: ola@oceanbuilders.io
+  license:
+    name: 'Apache 2.0'
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+- url: https://oceanbuilders.herokuapp.com/v1/api
+
+tags:
+  - name: Auth
+  - name: Seapods
+  - name: Light Scenes
+  - name: Users
+  - name: Notifications
+  - name: Emergency Contacts
+  - name: Permissions
+  - name: Access Requests
+  
+components:
+  # Reusable schemas (data models)
+  schemas:
+    user:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        mobileNumber:
+          type: string
+          pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
+        password:
+          type: string
+          pattern: ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
+        country:
+          type: string
+      example:
+        firstName: Name
+        lastName: Name
+        email: user@example.com
+        mobileNumber: '+201564324522'
+        password: String@14*
+        country: Spain
+    seaPod:
+      type: object
+      properties:
+        SeaPodName:
+          type: string
+        exteriorFinish:
+          type: string
+        exterioirColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        sparFinish:
+          type: string
+        sparDesign:
+          type: string
+        deckEnclosure:
+          type: string
+        bedAndLivingRoomEnclousure:
+          type: string
+        power:
+          type: string
+        powerUtilities:
+          type: array
+          items:
+            type: string
+        underWaterRoomFinishing:
+          type: string
+        underWaterWindows:
+          type: string
+        soundSystem:
+          type: array
+          items:
+            type: string
+        masterBedroomFloorFinishing:
+          type: array
+          items:
+            type: string
+        masterBedroomInteriorWallColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        livingRoomloorFinishing:
+          type: string
+        livingRoomInteriorWallColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        kitchenfloorFinishing:
+            type: string
+        kitchenInteriorWallColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        hasWeatherStation:
+          type: boolean
+        entryStairs:
+          type: boolean
+        hasFathometer:
+          type: boolean
+        hasCleanWaterLevelIndicator:
+          type: boolean
+        interiorBedroomWallColor:
+          type: string
+          pattern: '^0xFF[A-F0-9]{6}$'
+        deckFloorFinishMaterial:
+          type: string
+        seaPodStatus:
+          type: string
+      example:
+        SeaPodName: Sea Breeze
+        exteriorFinish: exfinish
+        exterioirColor: '0xff123456'
+        sparFinish: sparFinish
+        sparDesign: sparDesign
+        deckEnclosure: deckEnclosure
+        bedAndLivingRoomEnclousure: bedAndLivingRoomEnclousure
+        power: power
+        powerUtilities: []
+        underWaterRoomFinishing: underWaterRoomFinishing
+        underWaterWindows: underWaterWindows
+        soundSystem: []
+        masterBedroomFloorFinishing: []
+        masterBedroomInteriorWallColor: '0xff123456'
+        livingRoomloorFinishing: livingRoomloorFinishing
+        livingRoomInteriorWallColor: '0xff123456'
+        kitchenfloorFinishing: kitchenfloorFinishing
+        kitchenInteriorWallColor: '0xff123456'
+        hasWeatherStation: false
+        entryStairs: true
+        hasFathometer: false
+        hasCleanWaterLevelIndicator: false
+        interiorBedroomWallColor: '0xff123456'
+        deckFloorFinishMaterial: deckFloorFinishMaterial
+        seaPodStatus: seaPodStatus
+    loginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          pattern: ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
+      example:
+        email: user@example.com
+        password: String@14*
+    lightScene:
+      type: object
+      properties: 
+        source:
+          type: string
+        sceneName:
+          type: string
+        rooms:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              moodes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    lightName:
+                      type: string
+                    lightColor:
+                      type: string
+                      pattern: '^0xFF[A-F0-9]{6}$'
+                    status:
+                      type: boolean
+                    brightness:
+                      type: integer
+                      minimum: 0
+                      maximum: 100
+      example:
+        source: seapod
+        sceneName: Day Mode
+        rooms:
+          - label: BedRoom
+            moodes:
+              - lightName: Lightstrip 1
+                lightColor: '0xFF9B9591'
+                status: false
+                brightness: 30
+              - lightName: Lightstrip 2
+                lightColor: '0xFF123456'
+                status: true
+                brightness: 50
+    light:
+      type: object
+      properties:
+        lightId:
+          type: integer
+        intensity:
+          type: integer
+          minimum: 0
+          maximum: 100
+      example:
+        lightId: '5f19a3f3a225d02fb8499557'
+        intensity: 80
+    permission:
+      type: object
+      properties:
+        Name:
+          type: string
+        Sets:
+          type: array
+          items:
+            type: object
+            properties:
+              Name:
+                type: string
+              Permissions:
+                type: object
+                properties:
+                  Status:
+                    type: string
+                    enum:
+                      - 'ON'
+                      - 'OFF'
+                      - EMERGENCY
+                  Name:
+                    type: string
+      example:
+        Name: close friend
+        Sets:
+          - Name: MainControls
+            Permissions:
+              - Status: 'ON'
+                Name: changeOrientation
+              - Status: 'ON'
+                Name: raiseLowerStairs
+              - Status: 'ON'
+                Name: frostWindows
+              - Status: 'ON'
+                Name: modifyACTemp
+              - Status: 'ON'
+                Name: doorsControl
+              - Status: 'ON'
+                Name: windowsControl
+              - Status: 'ON'
+                Name: smartWindowsControl
+              - Status: 'ON'
+                Name: powerSupply
+              - Status: 'ON'
+                Name: waterSupply
+              - Status: 'ON'
+                Name: audioSystem
+              - Status: 'ON'
+                Name: stove
+              - Status: 'ON'
+                Name: oven
+          - Name: Cameras
+            Permissions:
+              - Status: 'ON'
+                Name: kitchen
+              - Status: 'ON'
+                Name: livingRoom
+              - Status: 'ON'
+                Name: Bedroom
+          - Name: Lighting
+            Permissions:
+              - Status: 'ON'
+                Name: turnLights
+              - Status: 'ON'
+                Name: modifyIntensity
+              - Status: 'ON'
+                Name: switchLightscene
+              - Status: 'ON'
+                Name: addPersonalLightscene
+              - Status: 'ON'
+                Name: addGlobalLightscene
+              - Status: 'ON'
+                Name: manageGlobalLightscene
+          - Name: AccessManagement
+            Permissions:
+              - Status: 'ON'
+                Name: inviteGuests
+          - Name: SeapodInfo
+            Permissions:
+              - Status: 'ON'
+                Name: serialNumber
+              - Status: 'ON'
+                Name: modelInfoAndSpec
+    emergencyContact:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        mobileNumber:
+          type: string
+          pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
+      example:
+        firstName: Name
+        lastName: Name
+        email: user@example.com
+        mobileNumber: '+201092101362'
+    requestAccess:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - GUEST
+            - MEMBER
+            - VISITOR
+            - OWNER
+        period:
+          type: integer
+        vessleCode:
+          type: string
+        checkIn:
+          type: integer
+      example:
+        type: GUEST
+        period: 86400000
+        vessleCode: S0F83ED
+        checkIn: 1581191756216
+        
+  # Reusable path, query, header and cookie parameters
+  parameters:
+    notificationToken:
+      name: notificationToken
+      in: header
+      description: The notification token associated with the device.
+      schema:
+        type: string
+      required: true
+    hardwareId:
+      name: hardwareId
+      in: header
+      schema:
+        type: string
+      required: true
+    model:
+      name: model
+      in: header
+      schema:
+        type: string
+      required: true
+    x-auth-token:
+      name: x-auth-token
+      in: header
+      schema:
+        type: string
+      required: true
+    seapodId:
+      name: seapodId
+      in: path
+      description: Numeric ID of the seapod
+      required: true
+      schema:
+        type: string
+      example: '5f6f45ce5ced392ed4c95e7e'
+    userId:
+      name: userId
+      in: path
+      description: Numeric ID of the user
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    vesselCode:
+      name: vesselCode
+      in: path
+      description: Vessel Code of Seapod
+      required: true
+      schema:
+        type: string
+      example: 'S7798A7'
+    lightSceneId:
+      name: lightSceneId
+      in: path
+      description: Numeric ID of the light scene
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    permissionId:
+      name: permissionId
+      in: path
+      description: Numeric ID of the permission
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    notificationId:
+      name: notificationId
+      in: path
+      description: Numeric ID of the notification
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    emergencyContactId:
+      name: emergencyContactId
+      in: path
+      description: Numeric ID of the emergency contact
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    accessRequestId:
+      name: accessRequestId
+      in: path
+      description: Numeric ID of the access request
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+    accessInvitationId:
+      name: accessInvitationId
+      in: path
+      description: Numeric ID of the access invitation
+      required: true
+      schema:
+        type: string
+      example: '6019ab90e332510015f377d7'
+  
+  # Reusable responses, such as 401 Unauthorized or 400 Bad Request
+  responses:
+    404UserNotFound:
+      description: ''
+      content:
+        application/json:
+          schema:
+            type: object
+            properties: 
+              message:
+                type: string
+            example: 
+              message: User Not Found
+    
+paths:
+  /auth:
+    post:
+      tags:
+        - Auth
+      summary: Create new user associated with new seapod, it sends confirmation email
+      description: ''
+      operationId: SignUpWithSeaPodCreation
+      requestBody:
+        required: true
+        description: A JSON object containing user information and seapod information
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/user'
+                  seaPod:
+                    $ref: '#/components/schemas/seaPod'
+      parameters:
+        - $ref: '#/components/parameters/notificationToken'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/model'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  message:
+                    type: string
+                example: 
+                  message: 'An email has been sent to your email with further instructions' 
+        '404':
+          $ref: '#/components/responses/404UserNotFound'
+        '400':
+          description: 'user and sea pod data are required, Validation Error'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+    put:
+      tags:
+        - Auth
+      summary: Login with email and password
+      description: ''
+      operationId: login
+      requestBody:
+        required: true
+        description: A JSON object containing user login info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginUser'
+      parameters:
+        - $ref: '#/components/parameters/notificationToken'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/model'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your email and password combination was incorrect. Please try again.'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Login with token
+      description: ''
+      operationId: autoLogin
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your email and password combination was incorrect. Please try again.'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /auth/confirmation/{token}:
+    get:
+      tags:
+        - Auth
+      summary: Confirm the user account 
+      description: ''
+      operationId: confirm
+      parameters:
+        - name: token
+          in: path
+          description: 'confirmation token of user account'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your email and password combination was incorrect. Please try again.'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'  
+  
+  /auth/resend:
+    post:
+      tags:
+        - Auth
+      summary: Resend confirmation email
+      description: ''
+      operationId: resendConfirm
+      requestBody:
+        required: true
+        description: A JSON object containing user id
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId: 
+                  type: string
+              example:
+                userId: '5fe77c98478d4c09ae8de3b3'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your email and password combination was incorrect. Please try again.'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'  
+  
+  /users/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout
+      description: ''
+      operationId: Logout
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'error logging out'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /seapods:
+    post:
+      tags:
+        - Seapods
+      summary: Create New Seapod
+      description: ''
+      operationId: createSeapod
+      requestBody:
+        required: true
+        description: A JSON object containing seapod information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/seaPod'
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Seapod data is required, Seapod Validation'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /seapods/{seapodId}/name:
+    put:
+      tags:
+        - Seapods
+      summary: Change Seapod Name
+      description: ''
+      operationId: changeSeapodName
+      requestBody:
+        required: true
+        description: A JSON object containing new seapod name
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seapodName:
+                  type: string
+              example:
+                seapodName: Updated SeaPod Name
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            Invalid seapod id, Seapod name is required, Seapod name validation
+            faild
+        '403':
+          description: Access denied. you are not allowed to update the seapod name
+        '404':
+          description: Seapod not found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /seapods/{seapodId}/users/{userId}:
+    delete:
+      tags:
+        - Seapods
+      summary: Remove Member from Seapod
+      description: ''
+      operationId: removeUserFromSeapod
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            Invalid seapod id, Invalid user id, This member can't be
+            removed,SeaPod Must have at least one member
+        '403':
+          description: 'Access denied. you are not allowed to remove members'
+        '404':
+          description: 'Seapod not found, User not found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    get:
+      tags:
+        - Seapods
+      summary: Get seaPodUser Details by Id
+      description: ''
+      operationId: getUserDetails
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id, Invalid user id'
+        '404':
+          description: 'Seapod not found, User not found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    put:
+      tags:
+        - Seapods
+      summary: Toggle Access Disable for User
+      description: 'Owner shall be able to disable the access of guest and members. Owners also can disable the access of the tenant but under some special conditions and regulations'
+      operationId: toggleIsDisableStatus
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id, Invalid user id'
+        '403':
+          description: 'Your are not allowed to take this action on the current seapod'
+        '404':
+          description: 'Seapod not found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /seapods/qrcode/{vesselCode}:
+    get:
+      tags:
+        - Seapods
+      summary: Get QR Image for Seapod by vesselCode
+      description: ''
+      operationId: getQrImage
+      parameters:
+        - $ref: '#/components/parameters/vesselCode'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id, Invalid user id'
+        '403':
+          description: 'Forbidden. Access denied!'
+        '404':
+          description: 'Seapod not found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /seapods/{seapodId}/weatherSource/{source}:
+    put:
+      tags:
+        - Seapods
+      summary: Select Weather Source of the seapod 'local' or 'external'
+      description: ''
+      operationId: selectWeatherSource
+      parameters:
+        - name: source
+          in: path
+          description: 'Weather Source: local or external'
+          required: true
+          schema:
+            type: string
+          example: 'local'
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id!, Weather Source is required!'
+        '403':
+          description: 'Forbidden. Access denied!'
+        '404':
+          description: 'Seapod not found!'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /lightining-scenes/{seapodId}:
+    post:
+      tags:
+        - Light Scenes
+      summary: Create New LightScene
+      description: ''
+      operationId: createLightScene
+      requestBody:
+        required: true
+        description: A JSON object containing light scene
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/lightScene'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: >-
+            LightScene data is required, Invalid seapod id, LightScene
+            validation faild, Duplicated Scene Name, LightScene source is not
+            defiend
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'Seapod Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /lightining-scenes/{lightSceneId}:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Lightscene Details
+      description: ''
+      operationId: updateLightScene
+      requestBody:
+        required: true
+        description: A JSON object containing light scene
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/lightScene'
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            LightScene data is required, Invalid lightScene id, LightScene
+            validation faild, Duplicated Scene Name, LightScene source is not
+            defiend
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'LightScene Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    delete:
+      tags:
+        - Light Scenes
+      summary: Delete Lightscene
+      description: ''
+      operationId: deleteLightScene
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id'
+        '404':
+          description: 'LightScene Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /lightining-scenes/{seapodId}/intensity/{value}:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update LightScene Intensity
+      description: ''
+      operationId: updateLightSceneIntensity
+      parameters:
+        - name: value
+          in: path
+          description: 'Value of Intensity range from 0 to 100'
+          required: true
+          schema:
+            type: integer
+          example: 'local'
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id'
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'Seapod Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /lightining-scenes/{lightSceneId}/lightIntensity:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Light Intensity
+      description: ''
+      operationId: updateLightIntensity
+      requestBody:
+        required: true
+        description: A JSON object containing light
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/light'
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id'
+        '404':
+          description: 'LightScene Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /lightining-scenes/{seapodId}/status:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update LightScene Status (on/off)
+      description: ''
+      operationId: updateLightSceneStatus
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod id'
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'Seapod Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /lightining-scenes/{lightSceneId}/lightStatus:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Light Status
+      description: ''
+      operationId: updateLightStatus
+      requestBody:
+        required: true
+        description: A JSON object containing light id
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lightId:
+                  type: string
+              example:
+                lightId: '5f6f45ce5ced392ed4c95e7e'
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id'
+        '404':
+          description: 'LightScene Not Found, User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /lightining-scenes/{seapodId}/selected/{lightSceneId}:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Selected LightScene
+      description: ''
+      operationId: updateSelectedLightScene
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id, Invalid seapod id'
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'LightScene Not Found, User Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /lightining-scenes/{lightSceneId}/lightColor:
+    put:
+      tags:
+        - Light Scenes
+      summary: Update Color of Light
+      description: ''
+      operationId: updateLightColor
+      parameters:
+        - $ref: '#/components/parameters/lightSceneId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'  
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid lightScene id'
+        '401':
+          description: 'Access denied. Not A member at the seapod'
+        '404':
+          description: 'LightScene Not Found, User Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /users/reset:
+    put:
+      tags:
+        - Users
+      summary: Reset Password
+      description: ''
+      operationId: resetPassword
+      requestBody:
+        required: true
+        description: A JSON object containing current and new password
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  pattern: >-
+                    ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
+                newPassword:
+                  type: string
+                  pattern: >-
+                    ^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$
+              example:
+                currentPassword: String@14*
+                newPassword: String@14/+
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'  
+        - $ref: '#/components/parameters/notificationToken'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/model'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: >-
+            Current and new password are required, Password Validation failed,
+            current password is not correct
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /users/forget:
+    put:
+      tags:
+        - Users
+      summary: Forget Password
+      description: ''
+      operationId: forgetPassword
+      requestBody:
+        required: true
+        description: A JSON object containing email
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              example:
+                email: user@example.com
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /users:
+    put:
+      tags:
+        - Users
+      summary: Update Profile
+      description: ''
+      operationId: updateProfile
+      requestBody:
+        required: true
+        description: A JSON object containing new profile information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                mobileNumber:
+                  type: string
+                  pattern: '^(\+\d{1,3}[- ]?)?\d{10}$'
+                country:
+                  type: string
+              example:
+                firstName: Name
+                lastName: Name
+                email: user@example.com
+                mobileNumber: '+201092101362'
+                country: Egypt
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'  
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /users/me/seapods:
+    get:
+      tags:
+        - Users
+      summary: Get User Seapods
+      description: ''
+      operationId: getUserSeapods
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'  
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
+  /permissions/{seapodId}:
+    post:
+      tags:
+        - Permissions
+      summary: Add new permission
+      description: ''
+      operationId: addNewPermission
+      requestBody:
+        required: true
+        description: A JSON object containing permission information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/permission'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'    
+      responses:
+        '201':
+          description: 'Created Successfully'
+        '400':
+          description: >-
+            permission data is required, Invalid seapod Id, Duplicated
+            Permission Name
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+    put:
+      tags:
+        - Permissions
+      summary: Update permission
+      description: ''
+      operationId: updatePermission
+      requestBody:
+        required: true
+        description: A JSON object containing permission information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/permission'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId' 
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            permission data is required, Invalid seapod Id, Duplicated
+            Permission Name, Default Permission cannot be updated
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+
+  /permissions/{permissionId}/seapod/{seapodId}/name:
+    put:
+      tags:
+        - Permissions
+      summary: Rename permission
+      description: ''
+      operationId: renamePermission
+      requestBody:
+        required: true
+        description: A JSON object containing new name
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name:
+                  type: string
+              example:
+                Name: 'Close Friends Permission'
+      parameters:
+        - $ref: '#/components/parameters/permissionId'
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId' 
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            permission name is required, Invalid seapod Id, Invalid permission
+            Id, Duplicated Permission Name, Default Permission cannot be renamed
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /permissions/{permissionId}/seapod/{seapodId}:
+    delete:
+      tags:
+        - Permissions
+      summary: Delete permission
+      description: ''
+      operationId: deletePermission
+      parameters:
+        - $ref: '#/components/parameters/permissionId'
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId' 
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            Invalid seapod Id, Invalid permission Id, Default Permission cannot
+            be deleted
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /permissions/{seapodId}/user:
+    put:
+      tags:
+        - Permissions
+      summary: Add permission to user
+      description: ''
+      operationId: addPermissionToUser
+      requestBody:
+        required: true
+        description: A JSON object containing User Id and Permission Id
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                permissionId:
+                  type: string
+              example:
+                userId: '5ee8d9425d63472dd45d88d4'
+                permissionId: '5ee8ded5385e1722008f3366'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod Id, Invalid permission Id, Invalid user Id'
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+    delete:
+      tags:
+        - Permissions
+      summary: Revoke permission from user
+      description: ''
+      operationId: revokePermissionFromUser
+      # requestBody:
+      #   required: true
+      #   description: A JSON object containing User Id
+      #   content:
+      #     application/json:
+      #       schema:
+      #         type: object
+      #         properties:
+      #           userId:
+      #             type: string
+      #         example:
+      #           userId: '5ee8d9425d63472dd45d88d4'
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod Id, Invalid permission Id, Invalid user Id'
+        '403':
+          description: 'Access denied. Not the Owner of the seapod'
+        '404':
+          description: 'Permission Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+  /permissions/{seapodId}/seapod:
+    get:
+      tags:
+        - Permissions
+      summary: Get Seapod Permissions
+      description: ''
+      operationId: getSeapodPermissions
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid seapod Id'
+        '404':
+          description: 'Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /permissions/{permissionId}:
+    get:
+      tags:
+        - Permissions
+      summary: Get Permission By Id
+      description: ''
+      operationId: getPermissionById
+      parameters:
+        - $ref: '#/components/parameters/permissionId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid permission Id'
+        '404':
+          description: 'Permission Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /users/notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get User Notifications
+      description: ''
+      operationId: getUserNotifications
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+    put:
+      tags:
+        - Notifications
+      summary: Update All Seen Status of Notifications
+      description: ''
+      operationId: updateAllStatusNotifications
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /users/notifications/{notificationId}:
+    put:
+      tags:
+        - Notifications
+      summary: Toggle Seen Status of Notification by Id
+      description: ''
+      operationId: toggleStatusNotification
+      parameters:
+        - $ref: '#/components/parameters/notificationId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Notification Id'
+        '404':
+          description: 'Notification Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
+  /users/notifications/settings:
+    put:
+      tags:
+        - Notifications
+      summary: Update Notification Settings
+      description: ''
+      operationId: updateNotificationSettings
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: User Not Found
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /users/emergency-contacts:
+    put:
+      tags:
+        - Emergency Contacts
+      summary: Add Emergency Contact
+      description: ''
+      operationId: addEmergencyContact
+      requestBody:
+        required: true
+        description: A JSON object containing emergency contact information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/emergencyContact'
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /users/emergency-contacts/{emergencyContactId}:
+    put:
+      tags:
+        - Emergency Contacts
+      summary: Update Emergency Contact by Id
+      description: ''
+      operationId: updateEmergencyContact
+      parameters:
+        - $ref: '#/components/parameters/emergencyContactId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+    delete:
+      tags:
+        - Emergency Contacts
+      summary: Delete Emergency Contact by Id
+      description: ''
+      operationId: deleteEmergencyContact
+      parameters:
+        - $ref: '#/components/parameters/emergencyContactId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Your are not allowed to remove all emergency contacts'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/existing:
+    post:
+      tags:
+        - Access Requests
+      summary: Send Access Request for Existing Users
+      description: ''
+      operationId: sendAccessRequestForExistingUsers
+      requestBody:
+        required: true
+        description: A JSON object containing request access information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestAccess'
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Body is required, request validation faild'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, You are not allowed to update this request
+            at the current time
+        '404':
+          description: 'User Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/new:
+    post:
+      tags:
+        - Access Requests
+      summary: Send Access Request for New Users
+      description: ''
+      operationId: sendAccessRequestForNewUsers
+      requestBody:
+        required: true
+        description: A JSON object containing user information and access request information
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/user'
+                  seaPod:
+                    $ref: '#/components/schemas/requestAccess'
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: >-
+            Invalid Token, Body is required, request validation faild, user
+            validation failed
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: 'Forbidden. Access denied'
+        '404':
+          description: 'Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/{accessRequestId}/approval:
+    put:
+      tags:
+        - Access Requests
+      summary: Accept Access Request
+      description: ''
+      operationId: acceptAccessRequest
+      requestBody:
+        required: true
+        description: A JSON object containing request access acceptance information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - GUEST
+                    - MEMBER
+                    - VISITOR
+                    - OWNER
+                period:
+                  type: integer
+                permissionSetId:
+                  type: integer
+              example:
+                type: MEMBER
+                period: 0
+                permissionSetId: '5efdb15aeca70a1378c674ac'
+      parameters:
+        - $ref: '#/components/parameters/accessRequestId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: >-
+            Invalid Token, Body is required, Invalid Access Request Id, request
+            validation failed
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/{accessRequestId}/rejection:
+    put:
+      tags:
+        - Access Requests
+      summary: Reject Access Request
+      description: ''
+      operationId: rejectAccessRequest
+      parameters:
+        - $ref: '#/components/parameters/accessRequestId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Request Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
+  /access-requests/{accessRequestId}:
+    put:
+      tags:
+        - Access Requests
+      summary: Cancel Access Request
+      description: ''
+      operationId: cancelAccessRequest
+      parameters:
+        - $ref: '#/components/parameters/accessRequestId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Request Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+    
+    get:
+      tags:
+        - Access Requests
+      summary: Get Access Request by Id
+      description: ''
+      operationId: getAccessRequestById
+      parameters:
+        - $ref: '#/components/parameters/accessRequestId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Request Access Id'
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
+  /access-requests/user:
+    get:
+      tags:
+        - Access Requests
+      summary: Get All Access Requests & Invitations of User
+      description: ''
+      operationId: getAllAccessRequestsAndInvitations
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '404':
+          description: 'User Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+ 
+  /access-requests/invitations/{seapodId}:    
+    post:
+      tags:
+        - Access Requests
+      summary: Send Access Invitation and Add Member
+      description: ''
+      operationId: addMember
+      requestBody:
+        required: true
+        description: A JSON object containing invitation information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                message:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                period:
+                  type: integer  
+                type:
+                  type: string
+                  enum:
+                    - GUEST
+                    - MEMBER
+                    - VISITOR
+                    - OWNER
+                permissionSetId:
+                  type: integer
+              example:
+                name: Ola
+                message: Come join me?
+                email: iolagalal97@gmail.com
+                period: 0
+                type: MEMBER
+                checkIn: 1594131437830
+                permissionSetId: 60368ed1ff5d290fc5df52b0
+      parameters:
+        - $ref: '#/components/parameters/seapodId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: >-
+            Invalid Token, Body is required, Invalid seapod Id, Email Validation
+            faild, This user have an already invitation to access your SeaPod
+        '401':
+          description: >-
+            No token is provided, Access denied. You are not allowed to do this
+            operation
+        '403':
+          description: 'Forbidden. Access denied'
+        '404':
+          description: 'User Not Found, Seapod Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+          
+  /access-requests/invitations/{accessInvitationId}/approval:
+    put:
+      tags:
+        - Access Requests
+      summary: Accept Access Invitation
+      description: ''
+      operationId: acceptAccessInvitation
+      parameters:
+        - $ref: '#/components/parameters/accessInvitationId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Invityation Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/invitations/{accessInvitationId}/rejection:
+    put:
+      tags:
+        - Access Requests
+      summary: Reject Access Invitation
+      description: ''
+      operationId: rejectAccessInvitation
+      parameters:
+        - $ref: '#/components/parameters/accessInvitationId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Request Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /access-requests/invitations/{accessInvitationId}:
+    put:
+      tags:
+        - Access Requests
+      summary: Cancel Access Invitaion
+      description: ''
+      operationId: cancelAccessInvitation
+      parameters:
+        - $ref: '#/components/parameters/accessInvitationId'
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Invalid Token, Invalid Access Invitation Id'
+        '401':
+          description: 'No token is provided'
+        '403':
+          description: >-
+            Forbidden. Access denied, Not the owner. Your are not allowed to
+            take this action on the current seapod
+        '404':
+          description: 'Request Not Found'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
