@@ -762,12 +762,12 @@ class LightiningSceneService {
         );
         await seapod.populate('lightScenes').execPopulate();
 
-        const userAtSeapod = await seapod.users.find(user => user._id == userId);
+        const userAtSeapod = seapod.users.find(user => user._id == userId);
         if (!userAtSeapod) return {
             isError: true,
             statusCode: 404,
             error: 'User is not at Seapod'
-        }; 
+        };
         userAtSeapod.lighting['selectedScene'] = day._id;
         await seapod.populate('users.lighting.selectedScene').execPopulate();
 
