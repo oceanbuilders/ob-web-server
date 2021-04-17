@@ -1,4 +1,3 @@
-
 $('.cotainer').ready(function () {
 	addLog();
 });
@@ -7,7 +6,6 @@ $('.cotainer').ready(function () {
 function addLog() {
 
 	var settings = {
-        // "url": `http://localhost:3000/v1/logs/get`,
         "url": `/v1/logs/get`,
 		"method": "GET",
 		"timeout": 0,
@@ -26,7 +24,6 @@ function addLog() {
 
 			$("#log").append(content);
 		})
-
 
 	});
 }

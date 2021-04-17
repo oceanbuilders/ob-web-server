@@ -22,10 +22,7 @@ router.get('/get' , async (req, res) => {
 router.get('/', async (req, res) => {
     return res.status(200).sendFile(path.join(__dirname, '/../public/log.html'));
 });
-
 router.get('/js/log.js', (req, res) => {
-    console.log(__dirname);
-    
     res.sendFile(path.join(__dirname, '/../public/js/log.js'));
 
 });
