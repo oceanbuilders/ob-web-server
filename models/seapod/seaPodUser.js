@@ -30,7 +30,7 @@ module.exports = new mongoose.Schema({
     },
     lighting: {
         type: lighting,
-        default: lighting
+        default: {}
     },
     permissionSet: {
         type: mongoose.Schema.Types.ObjectId,
