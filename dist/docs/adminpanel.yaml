@@ -15,8 +15,11 @@ servers:
 
 tags:
   - name: Auth
+  - name: Admins
   - name: Seapods
   - name: Users
+  - name: Locations
+  - name: Devices
   
 components:
   # Reusable schemas (data models)
@@ -43,8 +46,8 @@ components:
         firstName: Name
         lastName: Name
         email: user@example.com
-        mobileNumber: '+201564324522'
         password: String@14*
+        mobileNumber: '+201564324522'
         country: Spain
     seaPod:
       type: object
@@ -429,13 +432,13 @@ components:
       example: '6019ab90e332510015f377d7'
     
 paths:
-  /admins/registration:
+  /admins/register:
     post:
       tags:
         - Auth
-      summary: Create new admin
+      summary: Register new admin
       description: ''
-      operationId: createAdmin
+      operationId: registerAdmin
       requestBody:
         required: true
         description: A JSON object containing admin information
@@ -485,7 +488,7 @@ paths:
     get:
       tags:
         - Auth
-      summary: Login with token
+      summary: Login with auth token of admin account
       description: ''
       operationId: autoLoginAdmin
       parameters:
@@ -499,6 +502,66 @@ paths:
         '500':
           description: 'Internal Server Error, Header Parameters is missing'
           
+  /admins/logout:
+    post:
+      tags:
+        - Auth
+      summary: logout
+      description: ''
+      operationId: LogoutAdmin
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /admins:
+    get:
+      tags: 
+        - Admins
+      summary: Get all admins
+      description: ''
+      operationId: getAllAdmins
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'Admins Info'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
+  /admins/invite:
+    post:
+      tags:
+        - Admins
+      summary: Invite new user
+      description: ''
+      operationId: inviteUser
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      requestBody:
+        required: true
+        description: A JSON object containing user information and access request information
+        content:
+          application/json:
+            schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/user'
+                  seaPod:
+                    $ref: '#/components/schemas/requestAccess'
+      responses:
+        '200':
+          description: 'Admins Info'
+        '500':
+          description: 'Internal Server Error, Header Parameters is missing'
+  
   /seapods:
     get:
       tags:
@@ -513,7 +576,7 @@ paths:
         '200':
           description: 'OK'
         '500':
-          description: 'Internal Server Error'  
+          description: 'Internal Server Error'
   
   /seapods/{seapodId}:
     get:
@@ -529,6 +592,8 @@ paths:
       responses:
         '200':
           description: 'OK'
+        '400':
+          description: 'Seapod Not Found.'  
         '500':
           description: 'Internal Server Error' 
           
@@ -536,7 +601,7 @@ paths:
     get:
       tags:
         - Seapods
-      summary: Get Seapod's Owner Info by Seapod Id
+      summary: Get seapod's owner Info by seapod Id
       description: ''
       operationId: getSeapodOwner
       parameters:
@@ -549,5 +614,57 @@ paths:
         '400':
           description: 'Seapod Not Found.'  
         '500':
+          description: 'Internal Server Error'
+          
+  /users:
+    get:
+      tags:
+        - Users
+      summary: List all users & their seapods
+      description: ''
+      operationId: getUsers
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '500':
+          description: 'Internal Server Error'
+          
+  /users/owners:
+    get:
+      tags:
+        - Users
+      summary: List all owners & their seapods
+      description: ''
+      operationId: getOwners
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+      responses:
+        '200':
+          description: 'OK'
+        '500':
+          description: 'Internal Server Error'
+          
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get User Info by Id
+      description: ''
+      operationId: getUserById
+      parameters:
+        - $ref: '#/components/parameters/x-auth-token'
+        - $ref: '#/components/parameters/hardwareId'
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: 'OK'
+        '400':
+          description: 'Usre Not Found.'  
+        '500':
           description: 'Internal Server Error' 
+            
   
